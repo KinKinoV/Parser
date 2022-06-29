@@ -14,7 +14,7 @@ def main():
 
     driver.find_element(By.NAME, input("Enter name of 'password' field: ")).send_keys(password)
 
-    driver.find_element(By.NAME, input("Enter class name of button field to login: ")).click()
+    driver.find_element(By.CSS_SELECTOR, input('Enter CSS selector search template (eg: <tag_name>[<parameter_1>="..."][<parameter_2>="..."]): ')).click()
 
     #driver.close()
 
