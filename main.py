@@ -10,11 +10,11 @@ driver = webdriver.Firefox(executable_path="C:\\Program Files\\Mozilla Firefox\\
 driver.get(input("Enter link to forum login: "))
 
 def main():
-    driver.find_element(By.ID, input("Enter id of 'username' field: ")).send_keys(username)
+    driver.find_element(By.NAME, input("Enter name of 'username' field: ")).send_keys(username)
 
-    driver.find_element(By.ID, input("Enter id of 'password' field: ")).send_keys(password)
+    driver.find_element(By.NAME, input("Enter name of 'password' field: ")).send_keys(password)
 
-    driver.find_element(By.NAME, input("Enter class name of button to login: ")).click()
+    driver.find_element(By.NAME, input("Enter class name of button field to login: ")).click()
 
     #driver.close()
 
