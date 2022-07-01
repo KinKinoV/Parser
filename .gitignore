@@ -1,4 +1,6 @@
 test.py
+Parser.pyproj
+Parser.sln
 
 geckodriver.log
 
@@ -8,3 +10,4 @@ account_names.txt
 browser_path.txt
 
 /__pycache__
+/.vs
