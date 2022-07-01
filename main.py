@@ -1,22 +1,26 @@
 from bs4 import BeautifulSoup
 from selenium import webdriver
 from datetime import datetime
-import re
 import keyboard
 from get_driver import get_driver
 import os
+import gc
 
-check_file = os.path.isfile('browser_data.txt')
-driver = get_driver(input('Enter name of your browser: '), check_file)
+# check_driver = os.path.isfile('browser_data.txt')
+# if check_driver:
+#     with open('browser_data.txt', 'r') as file:
+#         driver = get_driver(file.read()[0], check_driver)
+# else:
+#     driver = get_driver('', False)
 
-def loop():
+driver = webdriver.Firefox(executable_path="C:\\Program Files\\Mozilla Firefox\\geckodriver.exe")
+def scrape_page():
     try:
         soup = BeautifulSoup(driver.page_source, 'html.parser')
         forum_posts = soup.find_all('article', class_="message-body js-selectToQuote")
         text = []
         for post in forum_posts:
-            text.append(post.find('div', { 'class' : 'bbWrapper'}))
-            
+            text.append(post.find('div', { 'class' : 'bbWrapper'}))    
         with open('account_names.txt', 'a', encoding="utf-8") as file:
             for tag in text:
                 if '@' in tag.text:
@@ -46,10 +50,11 @@ def loop():
                 if 'Пиши' in tag.text:
                     print(f'Found tag "Пиши"! in message: {tag.text}')
                     file.write(tag.text.split('Пиши')[1] + '\n')
+        del(soup, forum_posts, text)
+        gc.collect()
         if input('Continue?\nEnter [Y] to continue: ') == 'Y':
-            loop()
-        return False
-            
+            scrape_page()
+        return False   
     except Exception as e:
         print(e)
         with open('error_log.txt', 'a') as log:
@@ -59,12 +64,10 @@ def loop():
 
 def parse():
     driver.get(input("Enter link to forum (preferably login): "))
-    
     A = True
     while A:
         if keyboard.is_pressed("S"):
-            A = loop()
-    
+            A = scrape_page()
     if input('Нажмите Enter что-бы закрыть окно браузера')+'a':
         driver.close()
 
