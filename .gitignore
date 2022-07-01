@@ -2,3 +2,4 @@ geckodriver.log
 error_log.txt
 result.txt
 account_names.txt
+browser_path.txt

@@ -3,7 +3,11 @@ from selenium import webdriver
 from datetime import datetime
 import re
 import keyboard
-driver = webdriver.Firefox(executable_path="C:\\Program Files\\Mozilla Firefox\\geckodriver.exe")
+from get_driver import get_driver
+import os
+
+check_file = os.path.isfile('browser_data.txt')
+driver = get_driver(input('Enter name of your browser: '), check_file)
 
 def loop():
     try:
