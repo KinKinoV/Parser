@@ -1,4 +1,3 @@
-from distutils.log import error
 from bs4 import BeautifulSoup, NavigableString, ResultSet, Tag
 from selenium import webdriver
 from selenium.webdriver.common.by import By
