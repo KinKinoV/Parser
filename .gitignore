@@ -1,4 +1,13 @@
+test.py
+Parser.pyproj
+Parser.sln
+
 geckodriver.log
+
 error_log.txt
 result.txt
 account_names.txt
+browser_data.txt
+
+/__pycache__
+/.vs
