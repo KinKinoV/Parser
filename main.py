@@ -76,7 +76,6 @@ try:
         soup = BeautifulSoup(s.get(forum_url).text, "html.parser")
         # Checking for pagination of forum
         check_pagination = soup.find('ul', class_="pageNav-main")
-        print(check_pagination)
         if check_pagination:
             scrape_forum_page(s, soup)
             print(f'{"-"*10}Scraped page 1 {"-"*10}')
