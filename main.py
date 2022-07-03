@@ -1,4 +1,3 @@
-from concurrent.futures import thread
 from bs4 import BeautifulSoup, NavigableString, ResultSet, Tag
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -38,9 +37,9 @@ try:
         find_names(text)
 
     # Scrapes all pages in a thread
-    def scrape_thread(current_thread:str)->None:
+    def scrape_thread(current_thread:str, s:requests.Session)->None:
         print(f'Scraping {current_thread}')
-        soup = BeautifulSoup(requests.get(current_thread).text, 'html.parser')
+        soup = BeautifulSoup(s.get(current_thread).text, 'html.parser')
         # Finding all posts and their html-tags
         forum_posts = soup.find_all('article', class_="message-body js-selectToQuote")
         # Checking for pagination
@@ -48,7 +47,7 @@ try:
         if check_pagination:
             check_same_ = Tag|NavigableString|None
             for i in range(2,500):
-                thread_soup = BeautifulSoup(requests.get(current_thread+f'page-{i}').text, "html.parser")
+                thread_soup = BeautifulSoup(s.get(current_thread+f'page-{i}').text, "html.parser")
                 check_same = thread_soup.find('article', class_="message-body js-selectToQuote")
                 if check_same_ == check_same:
                     break
@@ -65,58 +64,71 @@ try:
         gc.collect()
 
     # Scraping BS of current forum page
-    def scrape_forum_page(forum_page:BeautifulSoup):
+    def scrape_forum_page(s:requests.Session, forum_page:BeautifulSoup):
         thread_links = forum_page.find_all('div', class_="structItem-title")
         for tag in thread_links:
             a_tags = tag.findChildren('a')
-            scrape_thread(f'{forum_}{a_tags[1]["href"]}')
+            scrape_thread(f'{forum_}{a_tags[1]["href"]}', s)
 
     # Scraping all threads of the current forum
-    def scrape_forum()->bool:
+    def scrape_forum(s:requests.Session)->bool:
         forum_url = driver.current_url
-        with requests.Session() as s:
-            soup = BeautifulSoup(requests.get(forum_url).text, "html.parser")
-            # Checking for pagination of forum
-            check_pagination = soup.find('ul', class_="pageNav-main")
-            if check_pagination:
-                scrape_forum_page(soup)
-                del(soup)
-                gc.collect()
-                check_same_ = Tag|NavigableString|None
-                for i in range(2, 500):
-                    # Creating soup of the current page
-                    forum_page = BeautifulSoup(requests.get(forum_url+f'page-{i}').text, "html.parser")
-                    # Checking if we are on the last page
-                    check_same = forum_page.find('div', class_="structItem-title")
-                    if check_same_ == check_same:
-                        break
-                    else:
-                        # We are not on the last page, remembering unique info about current page...
-                        check_same_ = check_same
-                        # ...and scraping it
-                        scrape_forum_page(forum_page)
-                        print(f'{"-"*10}Scraped page {i}{"-"*10}')
+        soup = BeautifulSoup(s.get(forum_url).text, "html.parser")
+        # Checking for pagination of forum
+        check_pagination = soup.find('ul', class_="pageNav-main")
+        print(check_pagination)
+        if check_pagination:
+            scrape_forum_page(s, soup)
+            print(f'{"-"*10}Scraped page 1 {"-"*10}')
+            del(soup)
+            gc.collect()
+            check_same_ = Tag|NavigableString|None
+            for i in range(2, 500):
+                # Creating soup of the current page
+                forum_page = BeautifulSoup(s.get(forum_url+f'page-{i}').text, "html.parser")
+                # Checking if we are on the last page
+                check_same = forum_page.find('div', class_="structItem-title")
+                if check_same_ == check_same:
+                    break
+                else:
+                    # We are not on the last page, remembering unique info about current page...
+                    check_same_ = check_same
+                    # ...and scraping it
+                    scrape_forum_page(s, forum_page)
+                    print(f'{"-"*10}Scraped page {i}{"-"*10}')
             else:
                 # If no pagination, scraping current soup
-                scrape_forum_page(soup)
+                scrape_forum_page(s, soup)
             print(f'\n\nScraped {forum_url}!')
         return True
 
     def parse()->None:
-        #driver.get(input("Enter link to forum (preferably login): "))
+        # Получаю куки-файлы из селениума и передаю их скрипту для
+        # удачных реквестов страниц 
         driver.get(f"{forum_}login")
         driver.find_element(By.NAME, "login").send_keys("KinKin")
         driver.find_element(By.NAME, "password").send_keys("UResezure21!")
+
+        s = requests.Session()
+        if input('Have you completed login?'):
+            for cookie in driver.get_cookies():
+                c = {cookie['name']: cookie['value']}
+                s.cookies.update(c)
+            print("Cookies coppied successfully!")
+        
+        # Цикл для ручного запуска парсинга форума или остановки скрипта
         A = True
         while A:
             if keyboard.is_pressed("S"):
-                A = scrape_forum()
+                A = scrape_forum(s)
             if keyboard.is_pressed("Q"):
                 print("Stopping script!")
                 A = False
         driver.close()
+        
+    if __name__ == '__main__':
+        parse()
 
-    parse()
 except Exception as e:
         print(e)
         with open('error_log.txt', 'a') as log:
