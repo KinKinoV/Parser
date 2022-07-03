@@ -96,10 +96,10 @@ try:
                     # ...and scraping it
                     scrape_forum_page(s, forum_page)
                     print(f'{"-"*10}Scraped page {i}{"-"*10}')
-            else:
-                # If no pagination, scraping current soup
-                scrape_forum_page(s, soup)
-            print(f'\n\nScraped {forum_url}!')
+        else:
+            # If no pagination, scraping current soup
+            scrape_forum_page(s, soup)
+        print(f'\n\nScraped {forum_url}!')
         return True
 
     def parse()->None:
