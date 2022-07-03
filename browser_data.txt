@@ -1,2 +1,0 @@
-Firefox
-C:\\Program Files\\Mozilla Firefox\\geckodriver.exe
