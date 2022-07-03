@@ -1,3 +1,4 @@
+from distutils.log import error
 from bs4 import BeautifulSoup, NavigableString, ResultSet, Tag
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -8,6 +9,7 @@ import gc
 import requests
 import re
 
+word_exceptions = ['Telegram', 'Jabber', 'Driver', 'Yandex', 'TELEGRAM', 'License', 'Republic', 'Passport', 'Driving']
 # Ловим и записываем ошибки (error_log.txt)
 try:
     # Запускаем драйвер селениум
@@ -26,7 +28,8 @@ try:
                         # Accepted characters: A-z (case-insensitive), 0-9 and underscores. Length: 5-32 characters. .split(word)[1]
                         nicknames =  re.findall(r".\B(?=\w{5,32}\b)[a-zA-Z0-9]+(?:_[a-zA-Z0-9]+)*", tag.text)
                         for nick in nicknames:
-                            file.write(nick + '\n')
+                            if not (nick in word_exceptions):
+                                file.write(nick + '\n')
 
     # Scrapes text on thread's page
     def scrape_page(forum_posts:ResultSet)->None:
@@ -39,11 +42,12 @@ try:
     def scrape_thread(current_thread:str, s:requests.Session)->None:
         print(f'Scraping {current_thread}')
         soup = BeautifulSoup(s.get(current_thread).text, 'html.parser')
-        # Finding all posts and their html-tags
-        forum_posts = soup.find_all('article', class_="message-body js-selectToQuote")
         # Checking for pagination
         check_pagination = soup.find('ul', class_="pageNav-main")
+        # Finding all posts for case where there are only one page in thread
+        forum_posts = soup.find_all('article', class_="message-body js-selectToQuote")
         if check_pagination:
+            scrape_page(forum_posts)
             check_same_ = Tag|NavigableString|None
             for i in range(2,500):
                 thread_soup = BeautifulSoup(s.get(current_thread+f'page-{i}').text, "html.parser")
@@ -56,7 +60,7 @@ try:
                     scrape_page(forum_posts)
         else:
             scrape_page(forum_posts)
-        print("Succesfully scraped!\n\n")
+        print("Succesfully scraped!\n")
         del(soup)
         del(check_pagination)
         del(forum_posts)
@@ -67,7 +71,10 @@ try:
         thread_links = forum_page.find_all('div', class_="structItem-title")
         for tag in thread_links:
             a_tags = tag.findChildren('a')
-            scrape_thread(f'{forum_}{a_tags[1]["href"]}', s)
+            if len(a_tags) == 1:
+                scrape_thread(f'{forum_}{a_tags[0]["href"]}', s)
+            if len(a_tags) == 2:
+                scrape_thread(f'{forum_}{a_tags[1]["href"]}', s)         
 
     # Scraping all threads of the current forum
     def scrape_forum(s:requests.Session)->bool:
@@ -77,7 +84,7 @@ try:
         check_pagination = soup.find('ul', class_="pageNav-main")
         if check_pagination:
             scrape_forum_page(s, soup)
-            print(f'{"-"*10}Scraped page 1 {"-"*10}')
+            print(f'{"-"*10}Scraped page 1 {"-"*10}\n')
             del(soup)
             gc.collect()
             check_same_ = Tag|NavigableString|None
@@ -93,7 +100,7 @@ try:
                     check_same_ = check_same
                     # ...and scraping it
                     scrape_forum_page(s, forum_page)
-                    print(f'{"-"*10}Scraped page {i}{"-"*10}')
+                    print(f'{"-"*10}Scraped page {i}{"-"*10}\n')
         else:
             # If no pagination, scraping current soup
             scrape_forum_page(s, soup)
@@ -108,12 +115,13 @@ try:
         driver.find_element(By.NAME, "password").send_keys("UResezure21!")
 
         s = requests.Session()
-        if input('Have you completed login?'):
+        if input('Have you completed login? Enter [Y] to continue: ') == 'Y':
             for cookie in driver.get_cookies():
                 c = {cookie['name']: cookie['value']}
                 s.cookies.update(c)
             print("Cookies coppied successfully!")
-        
+        else:
+            raise Exception("Please, finish login on the site or check if you inputed Y on confirmation")
         # Цикл для ручного запуска парсинга форума или остановки скрипта
         A = True
         while A:
