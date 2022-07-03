@@ -4,7 +4,6 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.firefox.service import Service
 from datetime import datetime
 import keyboard
-from get_driver import get_driver
 import gc
 import requests
 import re
