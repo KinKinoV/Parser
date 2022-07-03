@@ -121,7 +121,8 @@ try:
                 s.cookies.update(c)
             print("Cookies coppied successfully!")
         else:
-            raise Exception("Please, finish login on the site or check if you inputed Y on confirmation")
+            print("You didn't enter Y!")
+            return
         # Цикл для ручного запуска парсинга форума или остановки скрипта
         A = True
         while A:
