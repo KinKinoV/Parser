@@ -15,7 +15,7 @@ try:
     s = Service("C:\\Program Files\\Mozilla Firefox\\geckodriver.exe")
     driver = webdriver.Firefox(service=s)
     #forum_= input('Enter main link to the forum')
-    forum_ = "https://s2.piratebuhta.info/"
+    forum_ = "https://s2.piratebuhta.info"
 
     # Writes found telegram tags/names or other key words to the file
     def find_names(forum_texts:list)->None:
@@ -109,7 +109,7 @@ try:
     def parse()->None:
         # Получаю куки-файлы из селениума и передаю их скрипту для
         # удачных реквестов страниц 
-        driver.get(f"{forum_}login")
+        driver.get(f"{forum_}/login")
         driver.find_element(By.NAME, "login").send_keys("KinKin")
         driver.find_element(By.NAME, "password").send_keys("UResezure21!")
 

@@ -1,4 +1,5 @@
 test.py
+result_optimization.py
 Parser.pyproj
 Parser.sln
 
@@ -7,6 +8,7 @@ geckodriver.log
 error_log.txt
 result.txt
 account_names.txt
+tg_result.txt
 browser_data.txt
 
 /__pycache__
