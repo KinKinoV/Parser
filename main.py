@@ -1,33 +1,44 @@
 from bs4 import BeautifulSoup, NavigableString, ResultSet, Tag
+from datetime import datetime
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.firefox.service import Service
-from datetime import datetime
-import keyboard
 import gc
-import requests
+import keyboard
 import re
+import requests
 
-word_exceptions = ['Telegram', 'Jabber', 'Driver', 'Yandex', 'TELEGRAM', 'License', 'Republic', 'Passport', 'Driving']
+# Name of file to save results to
+FIRST_RESULTS = 'txt\\account_names.txt'
+
+# Temporary!!! Later will be pulled from the database
+BANNED_EXCEPTIONS = ['Telegram', 'Jabber', 'Driver', 'Yandex', 'TELEGRAM', 'License', 'Republic', 'Passport', 'Driving',
+                    'template', 'ENGLISH', 'VERSION', 'Service', 'YANDEX', 'Yandex', 'yandex', 'version', 'Version', 'english',
+                    'English', 'Discount', 'contacts', 'communication', 'twitter', 'Twitter', 'TWITTER', 'google', 'Google',
+                    'account', 'Account', 'ACCOUNT', 'tiktok', 'TIKTOK', 'TikTok', 'Tiktok', 'handed', 'various', 'communal', 'services', 'statements', 'telegram', 'WesternUnion', 'viewtopic', 'WebMoney', 'LiqPay', 'PerfectMoney', 'Payeer', 'TeleMoney', 'Bitcoin', 'youtube', 'subscribers', 'subscriptions', 'social', 'networks', 'yourself', 'dislikes', 'publics', 'popularity', 'popular', 'famous', 'buying', 'instagram', 'Vkontakte', 'classmates', 'cheating', 'publications', 'offers', 'public', 'friends', 'Welcome', 'application', 'messenger', 'github', 'webogram', 'random', 'Example', 'Database', 'Personal', 'number', 'documents', 'instructions', 'Barcodes', 'contents', 'licenses', 'bitcoin', 'IPhone', 'market', 'product', 'context', 'search', 'Adidas', 'Climawarm', 'adidas', 'pukhovik', 'climawarm', 'Reebok', 'Classic', 'reebok', 'krossovki', 'krosovki', 'Disney', 'Princess', 'Frozen', 'Marvel', 'marvel', 'Heroes', 'heroes', 'Smashbox', 'Giorgio', 'Armani', 'Loreal', 'Lancome', 'Huawei', 'huawei', 'Xiaomi', 'xiaomi', 'mi', 'Redmi', 'RealMe', 'telega', 'Revolut', 'LeoPay', 'Kraken', 'Bitzlato', 'Binance', 'Bittrex', 'Poloniex', 'Coinpayments', 'Okcoin', 'Bitlish', 'Liteforex', 'Epaycore', 'airbnb', 'Webmoney']
+
+# Also temporary! Later will be pulled from the database or taken from the user
+KEY_WORDS = ['@', 'ТГ ', ' тг', 'Телеграмм', 'телеграм', 'телега', ' пиши ', 'Пиши']
+
+
 # Ловим и записываем ошибки (error_log.txt)
 try:
     # Запускаем драйвер селениум
     s = Service("C:\\Program Files\\Mozilla Firefox\\geckodriver.exe")
     driver = webdriver.Firefox(service=s)
-    #forum_= input('Enter main link to the forum')
-    forum_ = "https://s2.piratebuhta.info"
+    forum_= input('Enter main link to the forum: ')
+    #forum_ = "https://s2.piratebuhta.info"
 
     # Writes found telegram tags/names or other key words to the file
-    def find_names(forum_texts:list)->None:
-        key_words = ['@', 'ТГ ', ' тг', 'Телеграмм', 'телеграм', 'телега', ' пиши ', 'Пиши']
-        with open('account_names.txt', 'a', encoding="utf-8") as file:
+    def find_names(forum_texts:list)->None:  
+        with open(FIRST_RESULTS, 'a', encoding="utf-8") as file:
             for tag in forum_texts:
-                for word in key_words:
+                for word in KEY_WORDS:
                     if word in tag.text:
-                        # Accepted characters: A-z (case-insensitive), 0-9 and underscores. Length: 5-32 characters. .split(word)[1]
-                        nicknames =  re.findall(r".\B(?=\w{5,32}\b)[a-zA-Z0-9]+(?:_[a-zA-Z0-9]+)*", tag.text)
+                        # Accepted characters: A-z (case-insensitive), 0-9 and underscores. Length: 5-32 characters.
+                        nicknames =  re.findall(r".\B(?=\w{5,32}\b)[a-zA-Z0-9]+(?:_[a-zA-Z0-9]+)*", tag.text.split(word)[1])
                         for nick in nicknames:
-                            if not (nick in word_exceptions):
+                            if not (nick in BANNED_EXCEPTIONS):
                                 file.write(nick + '\n')
 
     # Scrapes text on thread's page
@@ -78,7 +89,8 @@ try:
     # Scraping all threads of the current forum
     def scrape_forum(s:requests.Session)->bool:
         forum_url = driver.current_url
-        soup = BeautifulSoup(s.get(forum_url).text, "html.parser")
+        html_form = s.get(forum_url).text
+        soup = BeautifulSoup(html_form, "html.parser")
         # Checking for pagination of forum
         check_pagination = soup.find('ul', class_="pageNav-main")
         if check_pagination:
@@ -101,9 +113,11 @@ try:
                     scrape_forum_page(s, forum_page)
                     print(f'{"-"*10}Scraped page {i}{"-"*10}\n')
         else:
-            # If no pagination, scraping current soup
+            # If no pagination, scraping current soup and outputting html page in case of error
+            with open('site_save.html', 'w') as file:
+                file.write(html_form)
             scrape_forum_page(s, soup)
-        print(f'\n\nScraped {forum_url}!')
+        print(f'\n\nScraped {forum_url}!\a')
         return True
 
     def parse()->None:
@@ -137,6 +151,6 @@ try:
 
 except Exception as e:
         print(e)
-        with open('error_log.txt', 'a') as log:
+        with open('txt\\error_log.txt', 'a') as log:
             log.write(f'{datetime.now()}\n{e}\n\n')
         driver.close()
