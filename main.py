@@ -9,8 +9,6 @@ import re
 import requests
 import sqlite3
 
-from phpBB import FORUM_STEP
-
 SITE_TAGS = None
 FORUM_STEP = int()
 THREAD_STEP = int()
@@ -182,10 +180,10 @@ def scrape_setup(s:requests.Session)->bool:
         s_word_flag = False
         del(special_word)
         gc.collect()
-    pagination_case = input('How pagination works on this forum? Just incrementing value (adding 1,2,3,...,100 to something like "page" or "index") \
-            or by counting post/threads (something like: &?start=15/30/45))\n [I] -- Incrementing, [C] -- counting')
+    pagination_case = input('How pagination works on this forum? Just by incrementing value (adding 1,2,3,...,100 to something like "page" or "index") \
+            or by counting post/threads (something like: ...&?start=15/30/45)?\n [I] -- Incrementing, [C] -- counting')
     if pagination_case == 'C':
-        print('You choose [C], please enter next data:')
+        print("You've chosen [C], please enter next data:")
         FORUM_STEP = int(input('Enter step for pagination for pages with threads(in phpBB usually 50): '))
         THREAD_STEP = int(input('Enter step for pagination for threads with posts(in phpBB usually 15): '))
     pagination_template =  input("Please, enter template that is added to the end of url with {{}} where page number is placed: ")
