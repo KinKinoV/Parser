@@ -8,5 +8,7 @@ geckodriver.log
 /__pycache__
 /.vs
 /txt
-/username - userID
+/userIdFetch
+/results
+/data
 sqlite.py
