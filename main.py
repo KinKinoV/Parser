@@ -1,4 +1,3 @@
-from lib2to3.pgen2.driver import Driver
 from bs4 import BeautifulSoup, NavigableString, ResultSet, Tag
 from time import sleep
 from selenium import webdriver
@@ -11,7 +10,7 @@ import re
 import requests
 import sqlite3
 
-FIRST_RESULTS = 'txt\\account_names.txt'
+FIRST_RESULTS = 'results\\usernames.txt'
 
 # PARSER SETTINGS FOR PARSE
 # Pagination step in case PAGINATION_CASE == 'C'
@@ -295,7 +294,7 @@ def scrape_setup(s:requests.Session)->bool:
         
     to_parse = []
     # Starting to scrape forum using links provided in "txt/to_parse.txt"
-    for line in open('txt\\to_parse.txt', 'r'):
+    for line in open('data\\to_parse.txt', 'r'):
         to_parse.append(str(line.rstrip()))
 
     forum_url = str()
