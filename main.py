@@ -40,6 +40,8 @@ BANNED_EXCEPTIONS = []
 # If any in thread's message, start searching for needed data
 KEY_WORDS = []
 
+DEBUG_MODE = False
+
 def start():
     global SITE_TAGS
     forum_soft = input('''Enter software name on which forum is working
@@ -65,7 +67,7 @@ def find_names(forum_texts:list)->None:
             for word in KEY_WORDS:
                 if word in tag.text:
                     # Accepted characters: A-z (case-insensitive), 0-9 and underscores. Length: 5-32 characters.
-                    found_data =  re.findall(re.compile(".\B(?=\w{5,32}\b)[a-zA-Z0-9]+(?:_[a-zA-Z0-9]+)*"), tag.text.split(word)[1])
+                    found_data =  re.findall(r".\B(?=\w{5,32}\b)[a-zA-Z0-9]+(?:_[a-zA-Z0-9]+)*", tag.text.split(word)[1])
                     for data in found_data:
                         total_found += 1
                         if not (data in BANNED_EXCEPTIONS):
@@ -111,7 +113,7 @@ def scrape_thread(current_thread:str, s:requests.Session)->None:
                     html_text = s.get(current_thread+PAGINATAION_TEMPLATE.format(i)).text
                     sleep(PAGE_LOAD_DELAY)
                 thread_soup = BeautifulSoup(html_text, "html.parser")
-                check_same = thread_soup.find(SITE_TAGS.thread_post_tag, SITE_TAGS.thread_post_parameter)
+                check_same = thread_soup.find('title')
                 if check_same_ == check_same:
                     break
                 else:
@@ -129,7 +131,7 @@ def scrape_thread(current_thread:str, s:requests.Session)->None:
                     html_text = s.get(current_thread+PAGINATAION_TEMPLATE.format(i)).text
                     sleep(PAGE_LOAD_DELAY)
                 thread_soup = BeautifulSoup(html_text, "html.parser")
-                check_same = thread_soup.find(SITE_TAGS.thread_post_tag, SITE_TAGS.thread_post_parameter)
+                check_same = thread_soup.find('title')
                 if check_same_ == check_same:
                     break
                 else:
@@ -150,7 +152,7 @@ def scrape_forum_page(s:requests.Session, forum_page:BeautifulSoup):
     for tag in thread_links:
         a_tags = tag.findChildren('a')
         if THREAD_LINK_POS:
-            if ('https://' in a_tags[0]["href"]) or ('http://' in a_tags[0]["href"]):
+            if ('https://' in a_tags[THREAD_LINK_POS-1]["href"]) or ('http://' in a_tags[THREAD_LINK_POS-1]["href"]):
                 if len(a_tags) == 1:
                     scrape_thread(f'{a_tags[0]["href"]}', s)
                 if len(a_tags) >= THREAD_LINK_POS:
@@ -161,11 +163,10 @@ def scrape_forum_page(s:requests.Session, forum_page:BeautifulSoup):
                 if len(a_tags) >= THREAD_LINK_POS:
                     scrape_thread(f'{FORUM}{a_tags[THREAD_LINK_POS-1]["href"]}', s)
         else:
-            if ('https://' in a_tags[0]["href"]) or ('http://' in a_tags[0]["href"]):
+            if ('https://' in a_tags[THREAD_LINK_POS-1]["href"]) or ('http://' in a_tags[THREAD_LINK_POS-1]["href"]):
                 scrape_thread(f'{a_tags[0]["href"]}', s)
             else:
                 scrape_thread(f'{FORUM}{a_tags[0]["href"]}', s)
-        
 
 # Scraping all threads of the current forum
 def scrape_forum(s:requests.Session, forum_url:str):
@@ -199,7 +200,7 @@ def scrape_forum(s:requests.Session, forum_url:str):
                     forum_page = BeautifulSoup(s.get(forum_url+PAGINATAION_TEMPLATE.format(i)).text, "html.parser")
                     sleep(PAGE_LOAD_DELAY)
                 # Checking if we are on the last page
-                check_same = forum_page.find(SITE_TAGS.forum_threads_tag, SITE_TAGS.forum_threads_parameter)
+                check_same = forum_page.find('title')
                 if check_same_ == check_same:
                     break
                 else:
