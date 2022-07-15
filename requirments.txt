@@ -5,3 +5,4 @@ selenium=4.2.0
 pyrogram=2.0.30
 tgcrypto=1.2.3
 xlsxwriter=3.0.3
+flask=2.1.3
