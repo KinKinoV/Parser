@@ -1,0 +1,86 @@
+<body>
+    <form action="{{ request.base_url }}" method="post">
+        <h1>Input data about forum's message body (where text is):</h1>
+        <p>
+            <label for="message_tag">Message tag:</label>
+            <input type="text" id="message_tag" name="message_tag">
+        </p>
+        {% for i in range(context['mp_amm']) %}
+        <p>
+            <h3>Input data for parameter {{ i+1 }}:</h3>
+            <p>
+                <label for="message_parameter{{ i }}_name">Parameter name:</label>
+                <input type="text" id="message_parameter{{ i }}_name" name="message_parameter{{ i }}_name">
+            </p>
+            <p>
+                <label for="message_parameter{{ i }}_value">Parameter value:</label>
+                <input type="text" id="message_parameter{{ i }}_value" name="message_parameter{{ i }}_value">
+                <label for="message_parameter{{ i }}_regex"> Does this value needs <a href="https://en.wikipedia.org/wiki/Regular_expression">regex?</a></label>
+                <input type="checkbox" id="message_parameter{{ i }}_regex" name="message_parameter{{ i }}_regex" value="True">
+            </p>
+        </p>
+        {% endfor %}
+        <h1>Input data about forum pagination module:</h1>
+        <p>
+            <label for="pagination_tag">Pagination tag:</label>
+            <input type="text" id="pagination_tag" name="pagination_tag">
+        </p>
+        {% for i in range(context['pp_amm']) %}
+        <p>
+            <h3>Input data for parameter {{ i+1 }}:</h3>
+            <p>
+                <label for="pagination_parameter{{ i }}_name">Parameter name:</label>
+                <input type="text" id="pagination_parameter{{ i }}_name" name="pagination_parameter{{ i }}_name">
+            </p>
+            <p>
+                <label for="pagination_parameter{{ i }}_value">Parameter value:</label>
+                <input type="text" id="pagination_parameter{{ i }}_value" name="pagination_parameter{{ i }}_value">
+                <label for="pagination_parameter{{ i }}_regex"> Does this value needs regex?</label>
+                <input type="checkbox" id="pagination_parameter{{ i }}_regex" name="pagination_parameter{{ i }}_regex" value="True">
+            </p>
+        </p>
+        {% endfor %}
+        <h1>Input data about forum's post's body module:</h1>
+        <p>
+            <label for="thread_post_tag">Thread's post tag:</label>
+            <input type="text" id="thread_post_tag" name="thread_post_tag">
+        </p>
+        {% for i in range(context['tp_amm']) %}
+        <p>
+            <h3>Input data for parameter {{ i+1 }}:</h3>
+            <p>
+                <label for="thread_post_parameter{{ i }}_name">Parameter name:</label>
+                <input type="text" id="thread_post_parameter{{ i }}_name" name="thread_post_parameter{{ i }}_name">
+            </p>
+            <p>
+                <label for="thread_post_parameter{{ i }}_value">Parameter value:</label>
+                <input type="text" id="thread_post_parameter{{ i }}_value" name="thread_post_parameter{{ i }}_value">
+                <label for="thread_post_parameter{{ i }}_regex"> Does this value needs regex?</label>
+                <input type="checkbox" id="thread_post_parameter{{ i }}_regex" name="thread_post_parameter{{ i }}_regex" value="True">
+            </p>
+        </p>
+        {% endfor %}
+        <h1>Input data about forum's threads module (this module MUST contain link to target thread):</h1>
+        <p>
+            <label for="forum_threads_tag">Forum thread's tag:</label>
+            <input type="text" id="forum_threads_tag" name="forum_threads_tag">
+        </p>
+        {% for i in range(context['ftp_amm']) %}
+        <p>
+            <h3>Input data for parameter {{ i+1 }}:</h3>
+            <p>
+                <label for="forum_threads_parameter{{ i }}_name">Parameter name:</label>
+                <input type="text" id="forum_threads_parameter{{ i }}_name" name="forum_threads_parameter{{ i }}_name">
+            </p>
+            <p>
+                <label for="forum_threads_parameter{{ i }}_value">Parameter value:</label>
+                <input type="text" id="forum_threads_parameter{{ i }}_value" name="forum_threads_parameter{{ i }}_value">
+                <label for="forum_threads_parameter{{ i }}_regex"> Does this value needs regex?</label>
+                <input type="checkbox" id="forum_threads_parameter{{ i }}_regex" name="forum_threads_parameter{{ i }}_regex" value="True">
+            </p>
+        </p>
+        {% endfor %}
+        <p>
+            <button type="submit">Submit</button>
+        </p>
+</body>
