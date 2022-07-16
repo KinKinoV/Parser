@@ -1,86 +1,231 @@
-<body>
-    <form action="{{ request.base_url }}" method="post">
-        <h1>Input data about forum's message body (where text is):</h1>
-        <p>
-            <label for="message_tag">Message tag:</label>
-            <input type="text" id="message_tag" name="message_tag">
-        </p>
-        {% for i in range(context['mp_amm']) %}
-        <p>
-            <h3>Input data for parameter {{ i+1 }}:</h3>
-            <p>
-                <label for="message_parameter{{ i }}_name">Parameter name:</label>
-                <input type="text" id="message_parameter{{ i }}_name" name="message_parameter{{ i }}_name">
-            </p>
-            <p>
-                <label for="message_parameter{{ i }}_value">Parameter value:</label>
-                <input type="text" id="message_parameter{{ i }}_value" name="message_parameter{{ i }}_value">
-                <label for="message_parameter{{ i }}_regex"> Does this value needs <a href="https://en.wikipedia.org/wiki/Regular_expression">regex?</a></label>
-                <input type="checkbox" id="message_parameter{{ i }}_regex" name="message_parameter{{ i }}_regex" value="True">
-            </p>
-        </p>
-        {% endfor %}
-        <h1>Input data about forum pagination module:</h1>
-        <p>
-            <label for="pagination_tag">Pagination tag:</label>
-            <input type="text" id="pagination_tag" name="pagination_tag">
-        </p>
-        {% for i in range(context['pp_amm']) %}
-        <p>
-            <h3>Input data for parameter {{ i+1 }}:</h3>
-            <p>
-                <label for="pagination_parameter{{ i }}_name">Parameter name:</label>
-                <input type="text" id="pagination_parameter{{ i }}_name" name="pagination_parameter{{ i }}_name">
-            </p>
-            <p>
-                <label for="pagination_parameter{{ i }}_value">Parameter value:</label>
-                <input type="text" id="pagination_parameter{{ i }}_value" name="pagination_parameter{{ i }}_value">
-                <label for="pagination_parameter{{ i }}_regex"> Does this value needs regex?</label>
-                <input type="checkbox" id="pagination_parameter{{ i }}_regex" name="pagination_parameter{{ i }}_regex" value="True">
-            </p>
-        </p>
-        {% endfor %}
-        <h1>Input data about forum's post's body module:</h1>
-        <p>
-            <label for="thread_post_tag">Thread's post tag:</label>
-            <input type="text" id="thread_post_tag" name="thread_post_tag">
-        </p>
-        {% for i in range(context['tp_amm']) %}
-        <p>
-            <h3>Input data for parameter {{ i+1 }}:</h3>
-            <p>
-                <label for="thread_post_parameter{{ i }}_name">Parameter name:</label>
-                <input type="text" id="thread_post_parameter{{ i }}_name" name="thread_post_parameter{{ i }}_name">
-            </p>
-            <p>
-                <label for="thread_post_parameter{{ i }}_value">Parameter value:</label>
-                <input type="text" id="thread_post_parameter{{ i }}_value" name="thread_post_parameter{{ i }}_value">
-                <label for="thread_post_parameter{{ i }}_regex"> Does this value needs regex?</label>
-                <input type="checkbox" id="thread_post_parameter{{ i }}_regex" name="thread_post_parameter{{ i }}_regex" value="True">
-            </p>
-        </p>
-        {% endfor %}
-        <h1>Input data about forum's threads module (this module MUST contain link to target thread):</h1>
-        <p>
-            <label for="forum_threads_tag">Forum thread's tag:</label>
-            <input type="text" id="forum_threads_tag" name="forum_threads_tag">
-        </p>
-        {% for i in range(context['ftp_amm']) %}
-        <p>
-            <h3>Input data for parameter {{ i+1 }}:</h3>
-            <p>
-                <label for="forum_threads_parameter{{ i }}_name">Parameter name:</label>
-                <input type="text" id="forum_threads_parameter{{ i }}_name" name="forum_threads_parameter{{ i }}_name">
-            </p>
-            <p>
-                <label for="forum_threads_parameter{{ i }}_value">Parameter value:</label>
-                <input type="text" id="forum_threads_parameter{{ i }}_value" name="forum_threads_parameter{{ i }}_value">
-                <label for="forum_threads_parameter{{ i }}_regex"> Does this value needs regex?</label>
-                <input type="checkbox" id="forum_threads_parameter{{ i }}_regex" name="forum_threads_parameter{{ i }}_regex" value="True">
-            </p>
-        </p>
-        {% endfor %}
-        <p>
-            <button type="submit">Submit</button>
-        </p>
-</body>
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport"
+            content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <title>Parameter data</title>
+        <link rel="stylesheet" href="{{ static('css/bootstrap.css') }}">
+    </head>
+    <body class="bg-dark text-light">
+        <main class="py-5">
+            <div class="container border border-light">
+                <form action="{{ request.base_url }}" method="post">
+                    <div class="row justify-content-center border border-light py-3">
+                        <div class="col col-lg-3">
+                            <label for="message_tag" class="form-label">
+                                Message tag:
+                            </label>
+                            <input type="text" id="message_tag" name="message_tag" class="form-control" placeholder="div, li, etc..." required>
+                            <small class="form-text text-muted">
+                                Input data about forum's message body (where text is)
+                            </small>
+                        </div>
+                        <div class="col col-lg-6">
+                            {% for i in range(context['mp_amm']) %}
+                            <p class="h5 text-center mb-3">
+                                Input data for parameter {{ i+1 }}:
+                            </p>
+                            <div class="form-group row">
+                                <div class="col-sm-4 text-right">
+                                    <label for="message_parameter{{ i }}_name" class="form-text form-label">
+                                        Parameter name:
+                                    </label>
+                                </div>
+                                <div class="col-sm-6">
+                                    <input type="text" id="message_parameter{{ i }}_name" name="message_parameter{{ i }}_name"
+                                        class="form-control" required>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-sm-4 text-right">
+                                    <label for="message_parameter{{ i }}_value" class="form-text form-label">
+                                        Parameter value:
+                                    </label>
+                                </div>
+                                <div class="col-sm-6">
+                                    <input type="text" id="message_parameter{{ i }}_value"
+                                        name="message_parameter{{ i }}_value" class="form-control" required>
+                                </div>
+                            </div>
+                            <div class="form-check form-group row w-75 ml-auto">
+                                <input class="form-check-input" type="checkbox" id="message_parameter{{ i }}_regex"
+                                    name="message_parameter{{ i }}_regex"
+                                    value="True">
+                                <label for="message_parameter{{ i }}_regex" class="form-check-label">
+                                    Does this value needs
+                                    <a href="https://en.wikipedia.org/wiki/Regular_expression">
+                                        regex?
+                                    </a>
+                                </label>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="row justify-content-center border border-light py-3">
+                        <div class="col col-lg-3">
+                            <label for="pagination_tag" class="form-label">
+                                Pagination tag:
+                            </label>
+                            <input type="text" id="pagination_tag" name="pagination_tag" class="form-control" required>
+                            <small class="form-text text-muted">
+                                Input data about forum pagination module
+                            </small>
+                        </div>
+                        <div class="col col-lg-6">
+                            {% for i in range(context['pp_amm']) %}
+                            <p class="h5 text-center mb-3">
+                                Input data for parameter {{ i+1 }}:
+                            </p>
+                            <div class="form-group row">
+                                <div class="col-sm-4 text-right">
+                                    <label for="pagination_parameter{{ i }}_name" class="form-text form-label">
+                                        Parameter name:
+                                    </label>
+                                </div>
+                                <div class="col-sm-6">
+                                    <input type="text" id="pagination_parameter{{ i }}_name" name="pagination_parameter{{ i }}_name"
+                                        class="form-control" required>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-sm-4 text-right">
+                                    <label for="pagination_parameter{{ i }}_value" class="form-text form-label">
+                                        Parameter value:
+                                    </label>
+                                </div>
+                                <div class="col-sm-6">
+
+                                    <input type="text" id="pagination_parameter{{ i }}_value"
+                                        name="pagination_parameter{{ i }}_value" class="form-control" required>
+                                </div>
+                            </div>
+                            <div class="form-check form-group row w-75 ml-auto">
+                                <input class="form-check-input" type="checkbox" id="pagination_parameter{{ i }}_regex"
+                                    name="pagination_parameter{{ i }}_regex"
+                                    value="True">
+                                <label for="pagination_parameter{{ i }}_regex" class="form-check-label">
+                                    Does this value needs
+                                    <a href="https://en.wikipedia.org/wiki/Regular_expression">
+                                        regex?
+                                    </a>
+                                </label>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="row justify-content-center border border-light py-3">
+                        <div class="col col-lg-3">
+                            <label for="thread_post_tag" class="form-label">
+                                Thread post tag:
+                            </label>
+                            <input type="text" id="thread_post_tag" name="thread_post_tag" class="form-control" required>
+                            <small class="form-text text-muted">
+                                Input data about forum's post's body module
+                            </small>
+                        </div>
+                        <div class="col col-lg-6">
+                            {% for i in range(context['tp_amm']) %}
+                            <p class="h5 text-center mb-3">
+                                Input data for parameter {{ i+1 }}:
+                            </p>
+                            <div class="form-group row">
+                                <div class="col-sm-4 text-right">
+                                    <label for="thread_post_parameter{{ i }}_name" class="form-text form-label">
+                                        Parameter name:
+                                    </label>
+                                </div>
+                                <div class="col-sm-6">
+                                    <input type="text" id="thread_post_parameter{{ i }}_name" name="thread_post_parameter{{ i }}_name"
+                                        class="form-control" required>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-sm-4 text-right">
+                                    <label for="thread_post_parameter{{ i }}_value" class="form-text form-label">
+                                        Parameter value:
+                                    </label>
+                                </div>
+                                <div class="col-sm-6">
+
+                                    <input type="text" id="thread_post_parameter{{ i }}_value"
+                                        name="thread_post_parameter{{ i }}_value" class="form-control" required>
+                                </div>
+                            </div>
+                            <div class="form-check form-group row w-75 ml-auto">
+                                <input class="form-check-input" type="checkbox" id="thread_post_parameter{{ i }}_regex"
+                                    name="thread_post_parameter{{ i }}_regex"
+                                    value="True">
+                                <label for="thread_post_parameter{{ i }}_regex" class="form-check-label">
+                                    Does this value needs
+                                    <a href="https://en.wikipedia.org/wiki/Regular_expression">
+                                        regex?
+                                    </a>
+                                </label>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="row justify-content-center border border-light py-3">
+                        <div class="col col-lg-3">
+                            <label for="forum_threads_tag" class="form-label">
+                                Forum's thread tag:
+                            </label>
+                            <input type="text" id="forum_threads_tag" name="forum_threads_tag" class="form-control" required>
+                            <small class="form-text text-muted">
+                                Input data about forum's threads module (this module MUST contain link to target thread)
+                            </small>
+                        </div>
+                        <div class="col col-lg-6">
+                            {% for i in range(context['ftp_amm']) %}
+                            <p class="h5 text-center mb-3">
+                                Input data for parameter {{ i+1 }}:
+                            </p>
+                            <div class="form-group row">
+                                <div class="col-sm-4 text-right">
+                                    <label for="forum_threads_parameter{{ i }}_name" class="form-text form-label">
+                                        Parameter name:
+                                    </label>
+                                </div>
+                                <div class="col-sm-6">
+                                    <input type="text" id="forum_threads_parameter{{ i }}_name" name="forum_threads_parameter{{ i }}_name"
+                                        class="form-control" required>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-sm-4 text-right">
+                                    <label for="forum_threads_parameter{{ i }}_value" class="form-text form-label">
+                                        Parameter value:
+                                    </label>
+                                </div>
+                                <div class="col-sm-6">
+
+                                    <input type="text" id="forum_threads_parameter{{ i }}_value"
+                                        name="forum_threads_parameter{{ i }}_value" class="form-control" required>
+                                </div>
+                            </div>
+                            <div class="form-check form-group row w-75 ml-auto">
+                                <input class="form-check-input" type="checkbox" id="forum_threads_parameter{{ i }}_regex"
+                                    name="forum_threads_parameter{{ i }}_regex"
+                                    value="True">
+                                <label for="forum_threads_parameter{{ i }}_regex" class="form-check-label">
+                                    Does this value needs
+                                    <a href="https://en.wikipedia.org/wiki/Regular_expression">
+                                        regex?
+                                    </a>
+                                </label>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="row justify-content-center mt-3 mb-5">
+                        <button class="btn btn-lg btn-success d-block w-25">
+                            Submit
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </main>
+    </body>
+</html>
