@@ -3,6 +3,9 @@ import json
 import re
 
 app = Flask(__name__)
+app.jinja_env.globals['static'] = (
+    lambda filename : url_for('static', filename=filename)
+)
 
 def start():
     app.run()
@@ -55,7 +58,7 @@ def get_tag_definition(mp_amm, pp_amm, tp_amm, ftp_amm):
             else:
                 thread_post_parameter[request.form.get(f'thread_post_parameter{0}_name')] = request.form.get(f'thread_post_parameter{0}_value')
         else:
-            for i in range(int(mp_amm)):
+            for i in range(int(tp_amm)):
                 if request.form.get(f'thread_post_parameter{i}_regex') == 'True':
                     thread_post_parameter[request.form.get(f'thread_post_parameter{i}_name')] = re.compile(request.form.get(f'thread_post_parameter{i}_value')).pattern
                 else:
@@ -67,7 +70,7 @@ def get_tag_definition(mp_amm, pp_amm, tp_amm, ftp_amm):
             else:
                 forum_threads_parameter[request.form.get(f'forum_threads_parameter{0}_name')] = request.form.get(f'forum_threads_parameter{0}_value')
         else:
-            for i in range(int(mp_amm)):
+            for i in range(int(ftp_amm)):
                 if request.form.get(f'forum_threads_parameter{i}_regex') == 'True':
                     forum_threads_parameter[request.form.get(f'forum_threads_parameter{i}_name')] = re.compile(request.form.get(f'forum_threads_parameter{i}_value')).pattern
                 else:

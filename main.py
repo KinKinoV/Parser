@@ -67,6 +67,7 @@ def find_names(forum_texts:list)->None:
             for word in KEY_WORDS:
                 if word in tag.text:
                     # Accepted characters: A-z (case-insensitive), 0-9 and underscores. Length: 5-32 characters.
+                    # In re.findall() RegEx !MUST! be written in format: r"<*Your RegEx*>". Using re.compile() breaks script
                     found_data =  re.findall(r".\B(?=\w{5,32}\b)[a-zA-Z0-9]+(?:_[a-zA-Z0-9]+)*", tag.text.split(word)[1])
                     for data in found_data:
                         total_found += 1
