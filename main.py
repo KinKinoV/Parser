@@ -7,6 +7,7 @@ import gc
 import keyboard
 import parseconfigs
 import re
+import os
 import requests
 import sqlite3
 
@@ -55,6 +56,12 @@ def start():
     if forum_soft == '2' or forum_soft == 'phpBB':
         SITE_TAGS = parseconfigs.phpBB()
     if forum_soft == '3' or forum_soft == 'Other':
+        try:
+            print('\n\nPlease, go to the http://localhost:5000/ and enter all needed data.\nAfter entering, press Ctrl+C in this window.')
+            os.system("py server.py")
+        except KeyboardInterrupt:
+            print('Server stoped!')
+            pass
         SITE_TAGS = parseconfigs.OtherSoft()
     
     parse()
