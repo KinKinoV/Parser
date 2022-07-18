@@ -1,3 +1,4 @@
+import json
 import re
 
 class Xceref:
@@ -50,29 +51,36 @@ class OtherSoft:
     thread_post_parameter = {}
     forum_threads_tag = str()
     forum_threads_parameter = {}
-        
+
     def __init__(self):
-        self.message_tag = input("Enter tag where a post's text is: ")
-        for i in range(int(input(f'How many parameters in a {self.message_tag} tag? '))):
-            if input("Do you need regular expressions for this tag? ") == 'Y':
-                self.message_parameter[input(f'Enter parameter {i+1} name: ')] = re.compile(input(f'Enter parameter {i+1} value: '))
-            else:
-                self.message_parameter[input(f'Enter parameter {i+1} name: ')] = (input(f'Enter parameter {i+1} value: '))
-        self.pagination_tag = input("Enter tag of the pagination module: ")
-        for i in range(int(input(f'How many parameters in a {self.pagination_tag} tag? '))):
-            if input("Do you need regular expressions for this tag? ") == 'Y':
-                self.pagination_parameter[input(f'Enter parameter {i+1} name: ')] = re.compile(input(f'Enter parameter {i+1} value: '))
-            else:
-                self.pagination_parameter[input(f'Enter parameter {i+1} name: ')] = input(f'Enter parameter {i+1} value: ')
-        self.thread_post_tag = input("Enter tag of the forum's post body: ")
-        for i in range(int(input(f'How many parameters in a {self.thread_post_tag} tag? '))):
-            if input("Do you need regular expressions for this tag? ") == 'Y':
-                self.thread_post_parameter[input(f'Enter parameter {i+1} name: ')] = re.compile(input(f'Enter parameter {i+1} value: '))
-            else:
-                self.thread_post_parameter[input(f'Enter parameter {i+1} name: ')] = input(f'Enter parameter {i+1} value: ')
-        self.forum_threads_tag = input("Enter tag of the thread's body on forum: ")
-        for i in range(int(input(f'How many parameters in a {self.forum_threads_tag} tag? '))):
-            if input("Do you need regular expressions for this tag? ") == 'Y':
-                self.forum_threads_parameter[input(f'Enter parameter {i+1} name: ')] = re.compile(input(f'Enter parameter {i+1} value: '))
-            else:
-                self.forum_threads_parameter[input(f'Enter parameter {i+1} name: ')] = input(f'Enter parameter {i+1} value: ')
+        with open('data\\other_soft_tags.txt', 'r', encoding='utf-8') as file:
+            tags = json.load(file)
+            regex_pattern = '/~/'
+
+            self.message_tag = tags['message_tag']
+            for key, value in tags['message_parameter'].items():
+                if regex_pattern in value:
+                    self.message_parameter[key] = re.compile(value.strip(regex_pattern))
+                else:
+                    self.message_parameter[key] = value
+
+            self.pagination_tag = tags['pagination_tag']
+            for key, value in tags['pagination_parameter'].items():
+                if regex_pattern in value:
+                    self.pagination_parameter[key] = re.compile(value.strip(regex_pattern))
+                else:
+                    self.pagination_parameter[key] = value
+
+            self.thread_post_tag = tags['thread_post_tag']
+            for key, value in tags['thread_post_parameter'].items():
+                if regex_pattern in value:
+                    self.thread_post_parameter[key] = re.compile(value.strip(regex_pattern))
+                else:
+                    self.thread_post_parameter[key] = value
+            
+            self.forum_threads_tag = tags['forum_threads_tag']
+            for key, value in tags['forum_threads_parameter'].items():
+                if regex_pattern in value:
+                    self.forum_threads_parameter[key] = re.compile(value.strip(regex_pattern))
+                else:
+                    self.forum_threads_parameter[key] = value
