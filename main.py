@@ -160,18 +160,19 @@ def scrape_forum_page(s:requests.Session, forum_page:BeautifulSoup):
     for tag in thread_links:
         a_tags = tag.findChildren('a')
         if THREAD_LINK_POS:
-            if ('https://' in a_tags[THREAD_LINK_POS-1]["href"]) or ('http://' in a_tags[THREAD_LINK_POS-1]["href"]):
-                if len(a_tags) == 1:
+            if len(a_tags) == 1:
+                if ('https://' in a_tags[0]["href"]) or ('http://' in a_tags[0]["href"]):
                     scrape_thread(f'{a_tags[0]["href"]}', s)
-                if len(a_tags) >= THREAD_LINK_POS:
-                    scrape_thread(f'{a_tags[THREAD_LINK_POS-1]["href"]}', s)
-            else:
-                if len(a_tags) == 1:
+                else:
                     scrape_thread(f'{FORUM}{a_tags[0]["href"]}', s)
-                if len(a_tags) >= THREAD_LINK_POS:
+                
+            if len(a_tags) >= THREAD_LINK_POS:
+                if ('https://' in a_tags[THREAD_LINK_POS-1]["href"]) or ('http://' in a_tags[THREAD_LINK_POS-1]["href"]):
+                    scrape_thread(f'{a_tags[THREAD_LINK_POS-1]["href"]}', s)
+                else:
                     scrape_thread(f'{FORUM}{a_tags[THREAD_LINK_POS-1]["href"]}', s)
         else:
-            if ('https://' in a_tags[THREAD_LINK_POS-1]["href"]) or ('http://' in a_tags[THREAD_LINK_POS-1]["href"]):
+            if ('https://' in a_tags[0]["href"]) or ('http://' in a_tags[0]["href"]):
                 scrape_thread(f'{a_tags[0]["href"]}', s)
             else:
                 scrape_thread(f'{FORUM}{a_tags[0]["href"]}', s)
@@ -274,7 +275,7 @@ def scrape_setup(s:requests.Session)->bool:
 
         if input("Does forum has special prefixes(post tags) that are links too? [Y]--Yes [N]--No\n") == 'Y':
             # Getting position of <a> tag in forum HTML for (!)threads(!) links
-            THREAD_LINK_POS = int(input("Enter position of a thread's link in main page's HTML: "))
+            THREAD_LINK_POS = int(input("Enter position of a thread's link in main page's HTML: ")) - 1
 
         if input("Does forum has bot protection (can load pages only through browser)? [Y]--Yes [N]--No\n") == 'Y':
             BOT_PROTECTION = True

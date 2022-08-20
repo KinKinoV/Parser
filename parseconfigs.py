@@ -11,8 +11,7 @@ class Xceref:
     thread_post_parameter ={'class' : 'message-body js-selectToQuote'} 
     forum_threads_tag = 'div'
     forum_threads_parameter = {'class' : 'structItem-title'}
-    s_word_flag = True
-    s_word = '/forums'
+    s_word_flag = False
     thread_link_pos = 2
     pagination_case = 'I'
     pagination_template = 'page-{}'
