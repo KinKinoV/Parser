@@ -121,7 +121,7 @@ def scrape_thread(current_thread:str, s:requests.Session)->None:
                     html_text = s.get(current_thread+PAGINATAION_TEMPLATE.format(i)).text
                     sleep(PAGE_LOAD_DELAY)
                 thread_soup = BeautifulSoup(html_text, "html.parser")
-                check_same = thread_soup.find('title')
+                check_same = thread_soup.find('link')
                 if check_same_ == check_same:
                     break
                 else:
@@ -139,7 +139,7 @@ def scrape_thread(current_thread:str, s:requests.Session)->None:
                     html_text = s.get(current_thread+PAGINATAION_TEMPLATE.format(i)).text
                     sleep(PAGE_LOAD_DELAY)
                 thread_soup = BeautifulSoup(html_text, "html.parser")
-                check_same = thread_soup.find('title')
+                check_same = thread_soup.find('link')
                 if check_same_ == check_same:
                     break
                 else:
@@ -209,7 +209,7 @@ def scrape_forum(s:requests.Session, forum_url:str):
                     forum_page = BeautifulSoup(s.get(forum_url+PAGINATAION_TEMPLATE.format(i)).text, "html.parser")
                     sleep(PAGE_LOAD_DELAY)
                 # Checking if we are on the last page
-                check_same = forum_page.find('title')
+                check_same = forum_page.find('link')
                 if check_same_ == check_same:
                     break
                 else:
@@ -231,7 +231,7 @@ def scrape_forum(s:requests.Session, forum_url:str):
                     forum_page = BeautifulSoup(s.get(forum_url+PAGINATAION_TEMPLATE.format(i)).text, "html.parser")
                     sleep(PAGE_LOAD_DELAY)
                 # Checking if we are on the last page
-                check_same = forum_page.find('title')
+                check_same = forum_page.find('link')
                 if check_same_ == check_same:
                     break
                 else:
