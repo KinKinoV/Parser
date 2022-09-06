@@ -167,10 +167,10 @@ def scrape_forum_page(s:requests.Session, forum_page:BeautifulSoup):
                     scrape_thread(f'{FORUM}{a_tags[0]["href"]}', s)
                 
             if len(a_tags) >= THREAD_LINK_POS:
-                if ('https://' in a_tags[THREAD_LINK_POS-1]["href"]) or ('http://' in a_tags[THREAD_LINK_POS-1]["href"]):
-                    scrape_thread(f'{a_tags[THREAD_LINK_POS-1]["href"]}', s)
+                if ('https://' in a_tags[THREAD_LINK_POS]["href"]) or ('http://' in a_tags[THREAD_LINK_POS]["href"]):
+                    scrape_thread(f'{a_tags[THREAD_LINK_POS]["href"]}', s)
                 else:
-                    scrape_thread(f'{FORUM}{a_tags[THREAD_LINK_POS-1]["href"]}', s)
+                    scrape_thread(f'{FORUM}{a_tags[THREAD_LINK_POS]["href"]}', s)
         else:
             if ('https://' in a_tags[0]["href"]) or ('http://' in a_tags[0]["href"]):
                 scrape_thread(f'{a_tags[0]["href"]}', s)
