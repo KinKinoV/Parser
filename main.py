@@ -167,10 +167,10 @@ def scrape_forum_page(s:requests.Session, forum_page:BeautifulSoup):
                     scrape_thread(f'{FORUM}{a_tags[0]["href"]}', s)
                 
             if len(a_tags) >= THREAD_LINK_POS:
-                if ('https://' in a_tags[THREAD_LINK_POS]["href"]) or ('http://' in a_tags[THREAD_LINK_POS]["href"]):
-                    scrape_thread(f'{a_tags[THREAD_LINK_POS]["href"]}', s)
+                if ('https://' in a_tags[THREAD_LINK_POS-1]["href"]) or ('http://' in a_tags[THREAD_LINK_POS-1]["href"]):
+                    scrape_thread(f'{a_tags[THREAD_LINK_POS-1]["href"]}', s)
                 else:
-                    scrape_thread(f'{FORUM}{a_tags[THREAD_LINK_POS]["href"]}', s)
+                    scrape_thread(f'{FORUM}{a_tags[THREAD_LINK_POS-1]["href"]}', s)
         else:
             if ('https://' in a_tags[0]["href"]) or ('http://' in a_tags[0]["href"]):
                 scrape_thread(f'{a_tags[0]["href"]}', s)
@@ -275,7 +275,7 @@ def scrape_setup(s:requests.Session)->bool:
 
         if input("Does forum has special prefixes(post tags) that are links too? [Y]--Yes [N]--No\n") == 'Y':
             # Getting position of <a> tag in forum HTML for (!)threads(!) links
-            THREAD_LINK_POS = int(input("Enter position of a thread's link in main page's HTML: ")) - 1
+            THREAD_LINK_POS = int(input("Enter position of a thread's link in main page's HTML: "))
 
         if input("Does forum has bot protection (can load pages only through browser)? [Y]--Yes [N]--No\n") == 'Y':
             BOT_PROTECTION = True
