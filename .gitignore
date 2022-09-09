@@ -9,6 +9,4 @@ geckodriver.log
 /.vs
 /txt
 /userIdFetch
-/results
-/data
 sqlite.py
