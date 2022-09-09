@@ -1,6 +1,5 @@
 from flask import Flask, request, render_template, redirect, url_for
 import json
-import re
 
 app = Flask(__name__)
 app.jinja_env.globals['static'] = (
