@@ -7,6 +7,4 @@ geckodriver.log
 
 /__pycache__
 /.vs
-/txt
-/userIdFetch
 sqlite.py
