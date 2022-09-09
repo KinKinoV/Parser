@@ -353,7 +353,7 @@ def parse()->None:
 
     options_ = Options()
     options_.page_load_strategy = 'eager'
-    s = Service("C:\\Program Files\\Mozilla Firefox\\geckodriver.exe")
+    s = Service("geckodriver.exe")
     DRIVER = webdriver.Firefox(service=s, options=options_)
 
     FORUM = input('Enter main link to the forum: ')
