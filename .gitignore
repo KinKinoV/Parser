@@ -7,4 +7,6 @@ geckodriver.log
 
 /__pycache__
 /.vs
+/data
+/results
 sqlite.py
