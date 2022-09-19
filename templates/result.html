@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>Saved Data</title>
+</head>
+<body class="bg-dark text-light">
+    <h1 class="display-1 text-center">
+        Saved data
+    </h1>
+    <div class="d-flex justify-content-center">
+        <table class = "container-sm table-bordered text-center border-white">
+            <tr class="bg-primary text-dark">
+                <th>Tag</th>
+                <th>Parameter(s)</th>
+            </tr>
+            <tr>
+                <td>{{ context['message_tag'] }}</td>
+                <td>
+                    {% for parameter in context['message_parameter'] %}
+                    <div>{{ parameter }} = "{{context['message_parameter'][parameter]}}"</div>
+                    {% endfor %}
+                </td>
+            </tr>
+            <tr>
+                <td>{{ context['pagination_tag'] }}</td>
+                <td>
+                    {% for parameter in context['pagination_parameter'] %}
+                    <div>{{ parameter }} = "{{context['pagination_parameter'][parameter]}}"</div>
+                    {% endfor %}
+                </td>
+            </tr>
+            <tr>
+                <td>{{ context['thread_post_tag'] }}</td>
+                <td>
+                    {% for parameter in context['thread_post_parameter'] %}
+                    <div>{{ parameter }} = "{{context['thread_post_parameter'][parameter]}}"</div>
+                    {% endfor %}
+                </td>
+            </tr>
+            <tr>
+                <td>{{ context['forum_threads_tag'] }}</td>
+                <td>
+                    {% for parameter in context['forum_threads_parameter'] %}
+                    <div>{{ parameter }} = "{{context['forum_threads_parameter'][parameter]}}"</div>
+                    {% endfor %}
+                </td>
+            </tr>
+        </table>
+    </div>
+</body>
+</html>
