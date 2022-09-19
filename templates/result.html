@@ -12,44 +12,55 @@
         Saved data
     </h1>
     <div class="d-flex justify-content-center">
-        <table class = "container-sm table-bordered text-center border-white">
-            <tr class="bg-primary text-dark">
-                <th>Tag</th>
-                <th>Parameter(s)</th>
-            </tr>
-            <tr>
-                <td>{{ context['message_tag'] }}</td>
-                <td>
-                    {% for parameter in context['message_parameter'] %}
-                    <div>{{ parameter }} = "{{context['message_parameter'][parameter]}}"</div>
-                    {% endfor %}
-                </td>
-            </tr>
-            <tr>
-                <td>{{ context['pagination_tag'] }}</td>
-                <td>
-                    {% for parameter in context['pagination_parameter'] %}
-                    <div>{{ parameter }} = "{{context['pagination_parameter'][parameter]}}"</div>
-                    {% endfor %}
-                </td>
-            </tr>
-            <tr>
-                <td>{{ context['thread_post_tag'] }}</td>
-                <td>
-                    {% for parameter in context['thread_post_parameter'] %}
-                    <div>{{ parameter }} = "{{context['thread_post_parameter'][parameter]}}"</div>
-                    {% endfor %}
-                </td>
-            </tr>
-            <tr>
-                <td>{{ context['forum_threads_tag'] }}</td>
-                <td>
-                    {% for parameter in context['forum_threads_parameter'] %}
-                    <div>{{ parameter }} = "{{context['forum_threads_parameter'][parameter]}}"</div>
-                    {% endfor %}
-                </td>
-            </tr>
-        </table>
+        <div class="container">
+            <table class = "table table-bordered text-left border-secondary text-light">
+                <thead>
+                    <tr class="table-primary">
+                        <th scope="col">#</th>
+                        <th scope="col">Tag</th>
+                        <th scope="col">Parameter(s)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <th scope="row">1</th>
+                        <td>{{ context['message_tag'] }}</td>
+                        <td>
+                            {% for parameter in context['message_parameter'] %}
+                            <div>{{ parameter }} = "{{context['message_parameter'][parameter]}}"</div>
+                            {% endfor %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">2</th>
+                        <td>{{ context['pagination_tag'] }}</td>
+                        <td>
+                            {% for parameter in context['pagination_parameter'] %}
+                            <div>{{ parameter }} = "{{context['pagination_parameter'][parameter]}}"</div>
+                            {% endfor %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">3</th>
+                        <td>{{ context['thread_post_tag'] }}</td>
+                        <td>
+                            {% for parameter in context['thread_post_parameter'] %}
+                            <div>{{ parameter }} = "{{context['thread_post_parameter'][parameter]}}"</div>
+                            {% endfor %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">4</th>
+                        <td>{{ context['forum_threads_tag'] }}</td>
+                        <td>
+                            {% for parameter in context['forum_threads_parameter'] %}
+                            <div>{{ parameter }} = "{{context['forum_threads_parameter'][parameter]}}"</div>
+                            {% endfor %}
+                        </td>
+                    </tr>
+                </tbody>    
+            </table>
+        </div>
     </div>
 </body>
 </html>
