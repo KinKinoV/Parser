@@ -7,20 +7,12 @@ app.jinja_env.globals['static'] = (
 )
 
 def start():
-    app.run(host='0.0.0.0')
+    app.run(host='0.0.0.0', debug=True)
 
-@app.route('/', methods=['GET', 'POST'])
+@app.route('/', methods=['GET'])
 def get_first_data():
-    if request.method == 'POST':
-        message_parameter_ammount = request.form.get('message_parameter_ammount')
-        pagination_parameter_ammount = request.form.get('pagination_parameter_ammount')
-        thread_post_parameter_ammount = request.form.get('thread_post_parameter_ammount')
-        forum_threads_parameter_ammount = request.form.get('forum_threads_parameter_ammount')
-        return redirect(url_for('get_tag_definition', mp_amm = message_parameter_ammount,
-                                                    pp_amm = pagination_parameter_ammount,
-                                                    tp_amm = thread_post_parameter_ammount,
-                                                    ftp_amm = forum_threads_parameter_ammount ))
-    return render_template("tag_parameter_ammount.html")
+    # Loads page where tags and their parameters are being inputed
+    return redirect(url_for('get_tag_definition', mp_amm = 1, pp_amm = 1, tp_amm = 1, ftp_amm = 1))
 
 
 @app.route('/tag_definition/<mp_amm>/<pp_amm>/<tp_amm>/<ftp_amm>', methods=["GET", "POST"])
@@ -88,6 +80,8 @@ def get_tag_definition(mp_amm, pp_amm, tp_amm, ftp_amm):
         }
         with open("data\\other_soft_tags.txt", 'w', encoding="utf-8") as file:
             file.write(json.dumps(data_to_pass))
+
+        return render_template("result.html", context=data_to_pass)
 
     context_ = {
         'mp_amm' : int(mp_amm),
