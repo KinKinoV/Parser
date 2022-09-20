@@ -89,6 +89,6 @@ def get_tag_definition(mp_amm, pp_amm, tp_amm, ftp_amm):
         'tp_amm' : int(tp_amm),
         'ftp_amm' : int(ftp_amm)
     }
-    return render_template("needed_data.html", context=context_)
+    return render_template("tag_data.html", context=context_)
 
 start()
