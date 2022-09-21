@@ -52,7 +52,7 @@ class OtherSoft:
     forum_threads_parameter = {}
 
     def __init__(self):
-        with open('data\\other_soft_tags.txt', 'r', encoding='utf-8') as file:
+        with open('data\\other_soft_tags.json', 'r', encoding='utf-8') as file:
             tags = json.load(file)
             regex_pattern = '/~/'
 
