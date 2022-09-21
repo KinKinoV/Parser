@@ -8,12 +8,14 @@
     <title>Saved Data</title>
 </head>
 <body class="bg-dark text-light">
-    <h1 class="display-1 text-center">
-        Saved data
-    </h1>
-    <div class="d-flex justify-content-center">
-        <div class="container">
-            <table class = "table table-bordered text-left border-secondary text-light">
+    
+    <div class="container-xxl">
+        <h1 class="display-1 text-center">Saved data</h1>
+    </div>
+    
+    <div class="container-xxl">
+        <div class="row justify-content-around">
+            <table class = "table table-bordered w-auto text-left border-secondary text-light">
                 <thead>
                     <tr class="table-primary">
                         <th scope="col">#</th>
@@ -27,7 +29,7 @@
                         <td>{{ context['message_tag'] }}</td>
                         <td>
                             {% for parameter in context['message_parameter'] %}
-                            <div>{{ parameter }} = "{{context['message_parameter'][parameter]}}"</div>
+                                {{ parameter }} = "{{context['message_parameter'][parameter]}}", 
                             {% endfor %}
                         </td>
                     </tr>
@@ -36,7 +38,7 @@
                         <td>{{ context['pagination_tag'] }}</td>
                         <td>
                             {% for parameter in context['pagination_parameter'] %}
-                            <div>{{ parameter }} = "{{context['pagination_parameter'][parameter]}}"</div>
+                                {{ parameter }} = "{{context['pagination_parameter'][parameter]}}", 
                             {% endfor %}
                         </td>
                     </tr>
@@ -45,7 +47,7 @@
                         <td>{{ context['thread_post_tag'] }}</td>
                         <td>
                             {% for parameter in context['thread_post_parameter'] %}
-                            <div>{{ parameter }} = "{{context['thread_post_parameter'][parameter]}}"</div>
+                                {{ parameter }} = "{{context['thread_post_parameter'][parameter]}}",
                             {% endfor %}
                         </td>
                     </tr>
@@ -54,7 +56,7 @@
                         <td>{{ context['forum_threads_tag'] }}</td>
                         <td>
                             {% for parameter in context['forum_threads_parameter'] %}
-                            <div>{{ parameter }} = "{{context['forum_threads_parameter'][parameter]}}"</div>
+                                {{ parameter }} = "{{context['forum_threads_parameter'][parameter]}}",
                             {% endfor %}
                         </td>
                     </tr>
