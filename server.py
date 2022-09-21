@@ -9,14 +9,14 @@ app.jinja_env.globals['static'] = (
 def start():
     app.run(host='0.0.0.0', debug=True)
 
-@app.route('/', methods=['GET'])
+@app.route('/', methods=['GET', 'POST'])
 def get_first_data():
-    # Loads page where tags and their parameters are being inputed
-    return redirect(url_for('get_tag_definition', mp_amm = 1, pp_amm = 1, tp_amm = 1, ftp_amm = 1))
+    # Main page
+    return render_template('index.html')
 
 
 @app.route('/tag_definition/<mp_amm>/<pp_amm>/<tp_amm>/<ftp_amm>', methods=["GET", "POST"])
-def get_tag_definition(mp_amm, pp_amm, tp_amm, ftp_amm):
+def get_tag_definition(mp_amm = 1, pp_amm = 1, tp_amm = 1, ftp_amm = 1):
     if request.method == 'POST':
         regex_pattern = '/~/'
         message_parameter = {}
@@ -78,10 +78,10 @@ def get_tag_definition(mp_amm, pp_amm, tp_amm, ftp_amm):
             'forum_threads_tag' : request.form.get('forum_threads_tag'),
             'forum_threads_parameter' : forum_threads_parameter
         }
-        with open("data\\other_soft_tags.txt", 'w', encoding="utf-8") as file:
+        with open("data\\other_soft_tags.json", 'w', encoding="utf-8") as file:
             file.write(json.dumps(data_to_pass))
 
-        return render_template("result.html", context=data_to_pass)
+        return redirect(url_for('get_other_data'))
 
     context_ = {
         'mp_amm' : int(mp_amm),
@@ -90,5 +90,30 @@ def get_tag_definition(mp_amm, pp_amm, tp_amm, ftp_amm):
         'ftp_amm' : int(ftp_amm)
     }
     return render_template("tag_data.html", context=context_)
+
+# Page to collect pagination type, bot protection case, etc.
+@app.route('/other_data/', methods=["GET", "POST"])
+def get_other_data():
+    if request.method == "POST":
+        return redirect(url_for('show_results'))
+    return render_template('other_data.html')
+
+# Page for final confirmation of inputed data
+@app.route("/results/", methods=['GET'])
+def show_results():
+    with open("data\\other_soft_tags.json", 'r', encoding="utf-8") as file:
+        data = json.load(file)
+        to_pass = {
+                'message_tag' : data['message_tag'],
+                'message_parameter' : data['message_parameter'],
+                'pagination_tag' : data['pagination_tag'],
+                'pagination_parameter' : data['pagination_parameter'],
+                'thread_post_tag' : data['thread_post_tag'],
+                'thread_post_parameter' : data['thread_post_parameter'],
+                'forum_threads_tag' : data['forum_threads_tag'],
+                'forum_threads_parameter' : data['forum_threads_parameter']
+        }
+    
+    return render_template("result.html", context=to_pass)
 
 start()
