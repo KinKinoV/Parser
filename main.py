@@ -4,7 +4,6 @@ from selenium import webdriver
 from selenium.webdriver.firefox.service import Service
 from selenium.webdriver.firefox.options import Options
 import gc
-import keyboard
 import parseconfigs
 import re
 import os
@@ -17,10 +16,6 @@ FIRST_RESULTS = 'results\\usernames.txt'
 # Pagination step in case PAGINATION_CASE == 'C'
 FORUM_STEP = int()
 THREAD_STEP = int()
-# Flag for special word to add to FORUM if needed
-S_WORD_FLAG = False
-# Position of a thread's link in thread's tag (in case if there are more than one link)
-THREAD_LINK_POS = int()
 # Pagination kind on forum and it's template to add to the end of needed link
 PAGINATION_CASE = str()
 PAGINATAION_TEMPLATE = str()
@@ -35,36 +30,17 @@ FORUM = str()
 # Selenium driver to use (scripts uses geckodriver for FireFox)
 DRIVER = None
 
+SEARCH_STRING = str()
+
 # Fetched from the DB
 # Words to NOT to write to result file
 BANNED_EXCEPTIONS = []
 # If any in thread's message, start searching for needed data
 KEY_WORDS = []
 
-DEBUG_MODE = False
+TO_PARSE=[]
 
-def start():
-    global SITE_TAGS
-    forum_soft = input('''Enter software name on which forum is working
-    Possible variants:
-        1.Xceref
-        2.phpBB
-        3.Other\n
-    Enter name or number: ''')
-    if forum_soft == '1' or forum_soft == 'Xceref':
-        SITE_TAGS = parseconfigs.Xceref()
-    if forum_soft == '2' or forum_soft == 'phpBB':
-        SITE_TAGS = parseconfigs.phpBB()
-    if forum_soft == '3' or forum_soft == 'Other':
-        try:
-            print('\n\nPlease, go to the http://localhost:5000/ and enter all needed data.\nAfter entering, press Ctrl+C in this window.')
-            os.system("py server.py")
-        except KeyboardInterrupt:
-            print('Server stoped!')
-            pass
-        SITE_TAGS = parseconfigs.OtherSoft()
-    
-    parse()
+DEBUG_MODE = False
 
 # Writes found telegram tags/names or other key words to the file
 def find_names(forum_texts:list)->None:
@@ -73,14 +49,13 @@ def find_names(forum_texts:list)->None:
         for tag in forum_texts:
             for word in KEY_WORDS:
                 if word in tag.text:
-                    # Accepted characters: A-z (case-insensitive), 0-9 and underscores. Length: 5-32 characters.
-                    # In re.findall() RegEx !MUST! be written in format: r"<*Your RegEx*>". Using re.compile() breaks script
-                    found_data =  re.findall(r".\B(?=\w{5,32}\b)[a-zA-Z0-9]+(?:_[a-zA-Z0-9]+)*", tag.text.split(word)[1])
+                    # While writing regex pattern in python !USE! '\\' for one '\'
+                    found_data =  re.findall(SEARCH_STRING, tag.text.split(word)[1])
                     for data in found_data:
                         total_found += 1
                         if not (data in BANNED_EXCEPTIONS):
                             file.write(data + '\n')
-    print(f'Found {total_found} nicknames.')
+    print(f'Найдено {total_found} совпадений.')
 
 # Scrapes text on thread's page
 def scrape_page(forum_posts:ResultSet)->None:
@@ -91,7 +66,7 @@ def scrape_page(forum_posts:ResultSet)->None:
 
 # Scrapes all pages in a thread
 def scrape_thread(current_thread:str, s:requests.Session)->None:
-    print(f'Scraping {current_thread}')
+    print(f'Поиск в {current_thread}')
 
     html_text = str()
     if BOT_PROTECTION:
@@ -148,7 +123,7 @@ def scrape_thread(current_thread:str, s:requests.Session)->None:
                     scrape_page(forum_posts)
     else:
         scrape_page(forum_posts)
-    print("Succesfully scraped!\n")
+    print("Успешно проверили!\n")
     del(soup)
     del(check_pagination)
     del(forum_posts)
@@ -159,27 +134,29 @@ def scrape_forum_page(s:requests.Session, forum_page:BeautifulSoup):
     thread_links = forum_page.find_all(SITE_TAGS.forum_threads_tag, SITE_TAGS.forum_threads_parameter)
     for tag in thread_links:
         a_tags = tag.findChildren('a')
-        if THREAD_LINK_POS:
+        pos_ = 0
+        while True:
             if len(a_tags) == 1:
                 if ('https://' in a_tags[0]["href"]) or ('http://' in a_tags[0]["href"]):
                     scrape_thread(f'{a_tags[0]["href"]}', s)
+                    break
                 else:
                     scrape_thread(f'{FORUM}{a_tags[0]["href"]}', s)
-                
-            if len(a_tags) >= THREAD_LINK_POS:
-                if ('https://' in a_tags[THREAD_LINK_POS-1]["href"]) or ('http://' in a_tags[THREAD_LINK_POS-1]["href"]):
-                    scrape_thread(f'{a_tags[THREAD_LINK_POS-1]["href"]}', s)
-                else:
-                    scrape_thread(f'{FORUM}{a_tags[THREAD_LINK_POS-1]["href"]}', s)
-        else:
-            if ('https://' in a_tags[0]["href"]) or ('http://' in a_tags[0]["href"]):
-                scrape_thread(f'{a_tags[0]["href"]}', s)
+                    break
             else:
-                scrape_thread(f'{FORUM}{a_tags[0]["href"]}', s)
+                if not('prefix_id' in a_tags[pos_]["href"]):
+                    if ('https://' in a_tags[pos_]["href"]) or ('http://' in a_tags[pos_]["href"]):
+                        scrape_thread(f'{a_tags[pos_]["href"]}', s)
+                        break
+                    else:
+                        scrape_thread(f'{FORUM}{a_tags[pos_]["href"]}', s)
+                        break
+                else:
+                    pos_ = pos_ + 1
 
 # Scraping all threads of the current forum
 def scrape_forum(s:requests.Session, forum_url:str):
-    print(f'\n\nScrapping {forum_url}...\n')
+    print(f'\n\nПроизовдится поиск по теме {forum_url}...\n')
     html_form = str()
     if BOT_PROTECTION:
         DRIVER.get(forum_url)
@@ -193,7 +170,7 @@ def scrape_forum(s:requests.Session, forum_url:str):
     check_pagination = soup.find(SITE_TAGS.pagination_tag, SITE_TAGS.pagination_parameter)
     if check_pagination:
         scrape_forum_page(s, soup)
-        print(f'{"-"*10}Scraped page 1 {"-"*10}\n')
+        print(f'{"-"*10}Страница 1 завершена{"-"*10}\n')
         del(soup)
         gc.collect()
         check_same_ = Tag|NavigableString|None
@@ -217,7 +194,7 @@ def scrape_forum(s:requests.Session, forum_url:str):
                     check_same_ = check_same
                     # ...and scraping it
                     scrape_forum_page(s, forum_page)
-                    print(f'{"-"*10}Scraped page {i}{"-"*10}\n')
+                    print(f'{"-"*10}Страница {i} завершена{"-"*10}\n')
         if PAGINATION_CASE == 'C':
             page = 2
             for i in range(FORUM_STEP, 50000, FORUM_STEP):    
@@ -239,86 +216,30 @@ def scrape_forum(s:requests.Session, forum_url:str):
                     check_same_ = check_same
                     # ...and scraping it
                     scrape_forum_page(s, forum_page)
-                    print(f'{"-"*10}Scraped page {page}{"-"*10}\n')
+                    print(f'{"-"*10}Страница {page} завершена{"-"*10}\n')
                     page += 1
     else:
         scrape_forum_page(s, soup)
-    print(f'\n\nScraped {forum_url}!\a')
-
-def scrape_setup(s:requests.Session)->bool:
-
-    fetch_data()
-
-    global FORUM_STEP, THREAD_STEP, S_WORD_FLAG, THREAD_LINK_POS
-    global PAGINATION_CASE, PAGINATAION_TEMPLATE, BOT_PROTECTION
-    global PAGE_LOAD_DELAY
-
-    special_word = str()
-    if SITE_TAGS.type_ == 'Other':
-        # Getting special str() in case it's needed to succesfully load links
-        if input('Do you need to add special words to base forum link to go to other threads? [Y] -- Yes, [N] -- No\n') == 'Y':
-            special_word = input('Then enter this word: ')
-            S_WORD_FLAG = True
-        else:
-            S_WORD_FLAG = False
-            del(special_word)
-            gc.collect()
-        
-        # Checkin pagination type of the forum
-        PAGINATION_CASE = input('How pagination works on this forum? Just by incrementing value (adding 1,2,3,...,100 to something like "page" or "index") \
-                or by counting post/threads (something like: ...&?start=15/30/45)?\n[I] -- Incrementing, [C] -- counting\n')
-        if PAGINATION_CASE == 'C':
-            print("You've chosen [C], please enter next data:")
-            FORUM_STEP = int(input('Enter step for pagination for pages with threads(in phpBB usually 50): '))
-            THREAD_STEP = int(input('Enter step for pagination for threads with posts(in phpBB usually 15): '))
-        PAGINATAION_TEMPLATE =  input("Please, enter template that is added to the end of url with {} where page number is placed: ")
-
-        if input("Does forum has special prefixes(post tags) that are links too? [Y]--Yes [N]--No\n") == 'Y':
-            # Getting position of <a> tag in forum HTML for (!)threads(!) links
-            THREAD_LINK_POS = int(input("Enter position of a thread's link in main page's HTML: "))
-
-        if input("Does forum has bot protection (can load pages only through browser)? [Y]--Yes [N]--No\n") == 'Y':
-            BOT_PROTECTION = True
-        else:
-            BOT_PROTECTION = False
-            DRIVER.close()
-
-        if input("Does site need delay between page loads? [Y]--Yes [N]--No\n") == 'Y':
-            PAGE_LOAD_DELAY = float(input("Enter delay in seconds: "))
-        else:
-            PAGE_LOAD_DELAY = 0
-    else:
-        if SITE_TAGS.pagination_case == 'C':
-            PAGINATION_CASE == 'C'
-            FORUM_STEP = SITE_TAGS.forum_step
-            THREAD_STEP = SITE_TAGS.thread_step
-        if SITE_TAGS.pagination_case == 'I':
-            PAGINATION_CASE = 'I'
-        if SITE_TAGS.s_word_flag:
-            S_WORD_FLAG = True
-            special_word = SITE_TAGS.s_word
-        THREAD_LINK_POS = SITE_TAGS.thread_link_pos
-        PAGINATAION_TEMPLATE = SITE_TAGS.pagination_template
-        BOT_PROTECTION = SITE_TAGS.bot_protection
-        PAGE_LOAD_DELAY = SITE_TAGS.page_load_delay
-        
-    to_parse = []
-    # Starting to scrape forum using links provided in "txt/to_parse.txt"
-    for line in open('data\\to_parse.txt', 'r'):
-        to_parse.append(str(line.rstrip()))
-
-    forum_url = str()
-    for link in to_parse:
-        if S_WORD_FLAG:
-            forum_url = FORUM + special_word + link
-        else:
-            forum_url = FORUM + link
-        scrape_forum(s, forum_url)
     
-    return False
-        
-def fetch_data():
-    global BANNED_EXCEPTIONS, KEY_WORDS
+    print(f'\n\nПоиск по теме {forum_url} завершен!\a')    
+
+def scrape_setup()->bool:
+
+    global BANNED_EXCEPTIONS, KEY_WORDS, TO_PARSE, FORUM
+    global FORUM_STEP, THREAD_STEP
+    global PAGINATION_CASE, PAGINATAION_TEMPLATE, BOT_PROTECTION
+    global PAGE_LOAD_DELAY, SEARCH_STRING
+
+    PAGINATION_CASE = SITE_TAGS.pagination_case
+    if PAGINATION_CASE == 'C':
+        FORUM_STEP = SITE_TAGS.forum_step
+        THREAD_STEP = SITE_TAGS.thread_step
+    PAGINATAION_TEMPLATE = SITE_TAGS.pagination_template
+    BOT_PROTECTION = SITE_TAGS.bot_protection
+    PAGE_LOAD_DELAY = SITE_TAGS.page_load_delay
+    SEARCH_STRING = SITE_TAGS.search_string
+    FORUM = SITE_TAGS.forum_link
+    print(f"{FORUM} this is a scrape_setup() print.")
 
     conn = sqlite3.connect('parser.db')
     print('Succesfuly opened DB!')
@@ -337,48 +258,64 @@ def fetch_data():
     print('Fetched key words!')
     conn.close()
 
+    for line in open('data\\to_parse.txt', 'r'):
+        TO_PARSE.append(str(line.rstrip()))
+        
+def start_parse(s:requests.Session)-> bool:
+    
+    forum_url = str()
+    for link in TO_PARSE:
+        forum_url = FORUM + link
+        scrape_forum(s, forum_url)
+
 def copy_cookies(s:requests.Session):
     for cookie in DRIVER.get_cookies():
             c = {cookie['name']: cookie['value']}
             s.cookies.update(c)
-    print("Cookies coppied successfully!")
+    print("Куки успешно скопированы!")
 
 def parse()->None:
-    global FORUM, DRIVER
+    global FORUM, DRIVER, SITE_TAGS
+    scrape_setup()
 
     options_ = Options()
     options_.page_load_strategy = 'eager'
     s = Service("geckodriver.exe")
     DRIVER = webdriver.Firefox(service=s, options=options_)
 
-    FORUM = input('Enter main link to the forum: ')
     # Получаю куки-файлы из селениума и передаю их скрипту для
     # удачных реквестов страниц 
     DRIVER.get(f"{FORUM}")
     s = requests.Session()
-    if input('Is logged in user required to parse forum? [Y] -- Yes, [N] -- No\n') == 'Y':
-        print('Please, go to the login page of the forum and complete signing in.\n')
-        if input('Have you completed login? Enter [Y] to continue: ') == 'Y':
+
+    if SITE_TAGS.login_requirment:
+        print('Пожалуйста, перейдите в новое окно, что открылось и войдите в аккаунт.\n')
+        if input('Вы завершили вход? Если да, введите [Д] : ') == 'Д':
             copy_cookies(s)
         else:
-            print("You didn't enter Y!")
+            print("Вы ввели не 'Д'! Скрипт останавливается...")
             return
     else:
         copy_cookies(s)
     
-    # Цикл для ручного запуска парсинга форума или остановки скрипта
-    A = True
-    while A:
-        if keyboard.is_pressed("S"):
-            A = scrape_setup(s)
-        if keyboard.is_pressed("Q"):
-            print("Stopping script!")
-            try:
-                DRIVER.close()
-            except Exception as e:
-                print(e)
-                pass
-            A = False
+    start_parse(s)
+
+    print("Остановка скрипта...")
+
+    DRIVER.close()
+    
+
+def start():
+    global SITE_TAGS
+    try:
+        print('\n\nПожалуйста, перейдите по ссылке http://localhost:5000/ и введите все нужные данные.\n')
+        os.system("py server.py")
+    except KeyboardInterrupt:
+        print('Сервер остановлен!')
+        pass
+    SITE_TAGS = parseconfigs.ParseSettings()
+    
+    parse()
     
 if __name__ == '__main__':
     start()
