@@ -20,53 +20,26 @@ def get_tag_definition(mp_amm = 1, pp_amm = 1, tp_amm = 1, ftp_amm = 1):
     if request.method == 'POST':
         regex_pattern = '/~/'
         message_parameter = {}
-        if mp_amm == '1':
-            if request.form.get(f'message_parameter{0}_regex') == 'True':
-                message_parameter[request.form.get(f'message_parameter{0}_name')] = regex_pattern + request.form.get(f'message_parameter{0}_value')
-            else:
-                message_parameter[request.form.get(f'message_parameter{0}_name')] = request.form.get(f'message_parameter{0}_value')
-        else:
-            for i in range(int(mp_amm)):    
-                if request.form.get(f'message_parameter{i}_regex') == 'True':
-                    message_parameter[request.form.get(f'message_parameter{i}_name')] = regex_pattern + request.form.get(f'message_parameter{i}_value')
-                else:
-                    message_parameter[request.form.get(f'message_parameter{i}_name')] = request.form.get(f'message_parameter{i}_value')
         pagination_parameter = {}
-        if pp_amm == '1':
-            if request.form.get(f'pagination_parameter{0}_regex') == 'True':
-                pagination_parameter[request.form.get(f'pagination_parameter{0}_name')] = regex_pattern + request.form.get(f'pagination_parameter{0}_value')
-            else:
-                pagination_parameter[request.form.get(f'pagination_parameter{0}_name')] = request.form.get(f'pagination_parameter{0}_value')
-        else:
-            for i in range(int(pp_amm)):
-                if request.form.get(f'pagination_parameter{i}_regex') == 'True':
-                    pagination_parameter[request.form.get(f'pagination_parameter{i}_name')] = regex_pattern + request.form.get(f'pagination_parameter{i}_value')
-                else:
-                    pagination_parameter[request.form.get(f'pagination_parameter{i}_name')] = request.form.get(f'pagination_parameter{i}_value')
         thread_post_parameter = {}
-        if tp_amm == '1':
-            if request.form.get(f'thread_post_parameter{0}_regex') == 'True':
-                thread_post_parameter[request.form.get(f'thread_post_parameter{0}_name')] = regex_pattern + request.form.get(f'thread_post_parameter{0}_value')
-            else:
-                thread_post_parameter[request.form.get(f'thread_post_parameter{0}_name')] = request.form.get(f'thread_post_parameter{0}_value')
-        else:
-            for i in range(int(tp_amm)):
-                if request.form.get(f'thread_post_parameter{i}_regex') == 'True':
-                    thread_post_parameter[request.form.get(f'thread_post_parameter{i}_name')] = regex_pattern + request.form.get(f'thread_post_parameter{i}_value')
-                else:
-                    thread_post_parameter[request.form.get(f'thread_post_parameter{i}_name')] = request.form.get(f'thread_post_parameter{i}_value')
         forum_threads_parameter = {}
-        if ftp_amm == '1':
-            if request.form.get(f'forum_threads_parameter{0}_regex') == 'True':
-                forum_threads_parameter[request.form.get(f'forum_threads_parameter{0}_name')] = regex_pattern + request.form.get(f'forum_threads_parameter{0}_value')
-            else:
-                forum_threads_parameter[request.form.get(f'forum_threads_parameter{0}_name')] = request.form.get(f'forum_threads_parameter{0}_value')
-        else:
-            for i in range(int(ftp_amm)):
-                if request.form.get(f'forum_threads_parameter{i}_regex') == 'True':
-                    forum_threads_parameter[request.form.get(f'forum_threads_parameter{i}_name')] = regex_pattern + request.form.get(f'forum_threads_parameter{i}_value')
+        counters = [mp_amm, pp_amm, tp_amm, ftp_amm]
+        parameters_dict = [message_parameter, pagination_parameter, thread_post_parameter, forum_threads_parameter]
+        parameters_names = ['message_parameter', 'pagination_parameter', 'thread_post_parameter', 'forum_threads_parameter']
+        values_ = zip(counters, parameters_dict, parameters_names)
+
+        for count, parameter_dict, parameter_name in values_:
+            if count == '1':
+                if request.form.get(f'{parameter_name}{0}_regex') == 'True':
+                    parameter_dict[request.form.get(f'{parameter_name}{0}_name')] = regex_pattern + request.form.get(f'{parameter_name}{0}_value')
                 else:
-                    forum_threads_parameter[request.form.get(f'forum_threads_parameter{i}_name')] = request.form.get(f'forum_threads_parameter{i}_value')
+                    parameter_dict[request.form.get(f'{parameter_name}{0}_name')] = request.form.get(f'{parameter_name}{0}_value')
+            else:
+                for i in range(int(count)):    
+                    if request.form.get(f'{parameter_name}{i}_regex') == 'True':
+                        parameter_dict[request.form.get(f'{parameter_name}{i}_name')] = regex_pattern + request.form.get(f'{parameter_name}{i}_value')
+                    else:
+                        parameter_dict[request.form.get(f'{parameter_name}{i}_name')] = request.form.get(f'{parameter_name}{i}_value')
         
         data_to_pass = {
             'message_tag' : request.form.get('message_tag'),
