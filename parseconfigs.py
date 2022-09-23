@@ -66,6 +66,7 @@ class ParseSettings:
                 self.bot_protection = True
             
             self.page_load_delay = int(data['page_load_delay'])
+            # Temporary, later will be loaded from file too
             self.search_string = '.\\B(?=\\w{5,32}\\b)[a-zA-Z0-9]+(?:_[a-zA-Z0-9]+)*'
             self.forum_link = data['forum_link']
 
