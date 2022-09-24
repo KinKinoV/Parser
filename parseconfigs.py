@@ -15,7 +15,7 @@ class ParseSettings:
     pagination_case = str
     pagination_template = str
     bot_protection = False
-    page_load_delay = int
+    page_load_delay = float
     search_string = str
     forum_link = str
     login_requirment = False
@@ -65,8 +65,9 @@ class ParseSettings:
             if data['bot_protection'] == 'True':
                 self.bot_protection = True
             
-            self.page_load_delay = int(data['page_load_delay'])
+            self.page_load_delay = float(data['page_load_delay'])
             # Temporary, later will be loaded from file too
+            # For now this string can detect any possible telegram nickname
             self.search_string = '.\\B(?=\\w{5,32}\\b)[a-zA-Z0-9]+(?:_[a-zA-Z0-9]+)*'
             self.forum_link = data['forum_link']
 
