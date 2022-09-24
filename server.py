@@ -51,7 +51,7 @@ def get_tag_definition(mp_amm = 1, pp_amm = 1, tp_amm = 1, ftp_amm = 1):
             'forum_threads_tag' : request.form.get('forum_threads_tag'),
             'forum_threads_parameter' : forum_threads_parameter
         }
-        with open("data\\other_soft_tags.json", 'w', encoding="utf-8") as file:
+        with open("data\\parse_configs.json", 'w', encoding="utf-8") as file:
             file.write(json.dumps(data_to_pass))
 
         return redirect(url_for('get_other_data'))
@@ -68,13 +68,42 @@ def get_tag_definition(mp_amm = 1, pp_amm = 1, tp_amm = 1, ftp_amm = 1):
 @app.route('/other_data/', methods=["GET", "POST"])
 def get_other_data():
     if request.method == "POST":
+
+        data = dict
+        with open("data\\parse_configs.json", 'r', encoding='utf-8') as file:
+            data = json.load(file)
+        
+        data['pagination_case'] = request.form.get('paginationCase')
+        if data['pagination_case'] == 'C':
+            data['thread_step'] = request.form.get('threadStep')
+            data['forum_step'] = request.form.get('forumStep')
+
+        data['pagination_template'] = request.form.get('paginationTemplate')
+
+        if request.form.get('botProtection') == 'True':
+            data['bot_protection'] = 'True'
+        else:
+            data['bot_protection'] = 'False'
+
+        data['page_load_delay'] = request.form.get('pageLoadDelay')
+
+        data['forum_link'] = request.form.get('forumLink')
+
+        if request.form.get('loginRequirment') == 'True':
+            data['login_requirment'] = 'True'
+        else:
+            data['login_requirment'] = 'False'
+
+        with open("data\\parse_configs.json", 'w', encoding='utf-8') as file:
+            file.write(json.dumps(data))
+        
         return redirect(url_for('show_results'))
     return render_template('other_data.html')
 
 # Page for final confirmation of inputed data
 @app.route("/results/", methods=['GET'])
 def show_results():
-    with open("data\\other_soft_tags.json", 'r', encoding="utf-8") as file:
+    with open("data\\parse_configs.json", 'r', encoding="utf-8") as file:
         data = json.load(file)
         to_pass = {
                 'message_tag' : data['message_tag'],
@@ -84,8 +113,17 @@ def show_results():
                 'thread_post_tag' : data['thread_post_tag'],
                 'thread_post_parameter' : data['thread_post_parameter'],
                 'forum_threads_tag' : data['forum_threads_tag'],
-                'forum_threads_parameter' : data['forum_threads_parameter']
+                'forum_threads_parameter' : data['forum_threads_parameter'],
+                'pagination_case' : data['pagination_case'],
+                'pagination_template' : data['pagination_template'],
+                'page_load_delay' : data['page_load_delay'],
+                'forum_link' : data['forum_link'],
+                'login_requirment' : data['login_requirment']
         }
+
+        if data['pagination_case'] == 'C':
+            to_pass['thread_step'] = data['thread_step']
+            to_pass['forum_step'] = data['forum_step']
     
     return render_template("result.html", context=to_pass)
 
