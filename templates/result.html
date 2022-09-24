@@ -60,6 +60,43 @@
                             {% endfor %}
                         </td>
                     </tr>
+                    <tr>
+                        <th scope="row">5</th>
+                        <td>Pagination Case</td>
+                        <td>{{ context['pagination_case'] }}</td>
+                    </tr>
+                    {% if context['pagination_case'] == 'C' %}
+                    <tr>
+                        <th scope="row">5.1</th>
+                        <td>Thread step</td>
+                        <td>{{ context['thread_step'] }}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">5.2</th>
+                        <td>Forum step</td>
+                        <td>{{ context['forum_step'] }}</td>
+                    </tr>
+                    {% endif %}
+                    <tr>
+                        <th scope="row">6</th>
+                        <td>Pagination template</td>
+                        <td>{{ context['pagination_template'] }}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">7</th>
+                        <td>Page load delay</td>
+                        <td>{{ context['page_load_delay'] }}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">8</th>
+                        <td>Forum link</td>
+                        <td><a href="{{ context['forum_link'] }}">{{ context['forum_link'] }}</a></td>
+                    </tr>
+                    <tr>
+                        <th scope="row">9</th>
+                        <td>Login requirment</td>
+                        <td>{{ context['login_requirment'] }}</td>
+                    </tr>
                 </tbody>    
             </table>
         </div>
