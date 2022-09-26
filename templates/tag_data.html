@@ -5,38 +5,39 @@
         <meta name="viewport"
             content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
         <meta http-equiv="X-UA-Compatible" content="ie=edge">
-        <title>Parameter data</title>
+        <title>Дані тегів</title>
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet">
+        <link rel="shortcut icon" href="{{url_for('static', filename='img/favicon.ico')}}" type="image/x-icon">
         <script src="{{url_for('static', filename='javascript/addValue.js')}}"></script>
         <script src="{{url_for('static', filename='javascript/saveFormData.js')}}"></script>
     </head>
     <body class="bg-dark text-light">
         <div class="container-xxl">
-            <h1 class="display-1 text-center my-3">Enter tag data:</h1>
+            <h1 class="display-1 text-center my-3">Ведіть дані тегів:</h1>
         </div>
         <div class="container-xxl border border-3">
             <form action="{{ request.base_url }}" method="post" id="form">
                 
-                <div class="row justify-content-center border border-light py-4">
+                <div class="row justify-content-center py-4">
                     <div class="col col-4 border-end">
                         <label for="message_tag" class="h5 text-center mb-3">
-                            1.Message tag:
+                            1. Тег повідомлення(поста):
                         </label>
                         <input type="text" id="message_tag" name="message_tag" class="form-control" placeholder="div, li, etc..." required>
                         <small class="form-text text-muted">
-                            Input data about forum's message body (where text is)
+                            Ведіть назву тега, де знаходиться сам текст повідомлення(поста) форуму.
                         </small>
-                        
+                        <img class="img-fluid" src="{{ url_for('static', filename='img/messageTagExample.png')}}" alt="messageTagExample.png">
                     </div>
                     <div class="col col-8">
                         {% for i in range(context['mp_amm']) %}
                         <p class="h5 text-left mb-3">
-                            Input data for parameter {{ i+1 }}:
+                            Ведіть дані для параметра {{ i+1 }}:
                         </p>
                         <div class="form-group row py-2">
                             <div class="col col-2">
                                 <label for="message_parameter{{ i }}_name" class="form-text form-label">
-                                    Parameter name:
+                                    Назва параметра:
                                 </label>
                             </div>
                             <div class="col col-6">
@@ -46,8 +47,8 @@
                         </div>
                         <div class="form-group row py-2">
                             <div class="col col-2">
-                                <label for="message_parameter{{ i }}_value" class="form-text form-label">
-                                    Parameter value:
+                                <label for="message_parameter{{ i }}_value" class="form-text form-label text-nowrap">
+                                   Значення параметра:
                                 </label>
                             </div>
                             <div class="col col-6">
@@ -57,7 +58,7 @@
                             <div class="col col-4 py-2">
                                 <input class="form-check-input" type="checkbox" id="message_parameter{{ i }}_regex" name="message_parameter{{ i }}_regex" value="True">
                                 <label for="message_parameter{{ i }}_regex" class="form-check-label">
-                                    Does this value needs <a href="https://en.wikipedia.org/wiki/Regular_expression">regex?</a>
+                                    Використати <a href="https://en.wikipedia.org/wiki/Regular_expression">regex</a>?
                                 </label>
                             </div>
                         </div>
@@ -69,26 +70,26 @@
                 </div>
 
 
-                <div class="row justify-content-center border border-light py-4">
+                <div class="row justify-content-center border-top py-4">
                     <div class="col col-4 border-end">
                         <label for="pagination_tag" class="h5 text-center mb-3">
-                            2.Pagination tag:
+                            2. Тег пагінації:
                         </label>
                         <input type="text" id="pagination_tag" name="pagination_tag" class="form-control" required>
                         <small class="form-text text-muted">
-                            Input data about forum pagination module
+                            Ведіть назву тега, який відповідає за пагінацію форуму. Праворуч ведіть атрибути.
                         </small>
-                        
+                        <img class="img-fluid" src="{{ url_for('static', filename='img/paginationTagExample.png')}}" alt="paginationTagExample.png">
                     </div>
                     <div class="col col-8">
                         {% for i in range(context['pp_amm']) %}
                         <p class="h5 text-left mb-3">
-                            Input data for parameter {{ i+1 }}:
+                            Ведіть дані атрибута {{ i+1 }}:
                         </p>
                         <div class="form-group row py-2">
                             <div class="col-2">
                                 <label for="pagination_parameter{{ i }}_name" class="form-text form-label">
-                                    Parameter name:
+                                    Назва атрибута:
                                 </label>
                             </div>
                             <div class="col-6">
@@ -98,8 +99,8 @@
                         </div>
                         <div class="form-group row py-2">
                             <div class="col-2">
-                                <label for="pagination_parameter{{ i }}_value" class="form-text form-label">
-                                    Parameter value:
+                                <label for="pagination_parameter{{ i }}_value" class="form-text form-label text-nowrap">
+                                    Значення атрибута:
                                 </label>
                             </div>
                             <div class="col-6">
@@ -111,10 +112,7 @@
                                     name="pagination_parameter{{ i }}_regex"
                                     value="True">
                                 <label for="pagination_parameter{{ i }}_regex" class="form-check-label">
-                                    Does this value needs
-                                    <a href="https://en.wikipedia.org/wiki/Regular_expression">
-                                        regex?
-                                    </a>
+                                    Використати<a href="https://en.wikipedia.org/wiki/Regular_expression">regex</a>?
                                 </label>
                             </div>
                         </div> 
@@ -126,25 +124,26 @@
                 </div>
 
 
-                <div class="row justify-content-center border border-light py-4">
+                <div class="row justify-content-center border-top py-4">
                     <div class="col col-lg-4 border-end">
                         <label for="thread_post_tag" class="h5 text-center mb-3">
-                            3.Thread post tag:
+                            3. Тег тіла поста форуму:
                         </label>
                         <input type="text" id="thread_post_tag" name="thread_post_tag" class="form-control" required>
                         <small class="form-text text-muted">
-                            Input data about forum's post's body module
+                            Ведіть назву тега, який відповідає за тіло поста форуму (тег повідомлення повинен бути присутній в цьому тегу). Праворуч ведіть атрибути цього тегу.
                         </small>
+                        <img class="img-fluid" src="{{ url_for('static', filename='img/threadPostTagExample.png')}}" alt="threadPostTagExample.png">
                     </div>
                     <div class="col col-8">
                         {% for i in range(context['tp_amm']) %}
                         <p class="h5 text-left mb-3">
-                            Input data for parameter {{ i+1 }}:
+                            Ведіть дані атрибута {{ i+1 }}:
                         </p>
                         <div class="form-group row py-2">
                             <div class="col-2">
                                 <label for="thread_post_parameter{{ i }}_name" class="form-text form-label">
-                                    Parameter name:
+                                    Назва атрибута:
                                 </label>
                             </div>
                             <div class="col-6">
@@ -154,8 +153,8 @@
                         </div>
                         <div class="form-group row py-2">
                             <div class="col-2">
-                                <label for="thread_post_parameter{{ i }}_value" class="form-text form-label">
-                                    Parameter value:
+                                <label for="thread_post_parameter{{ i }}_value" class="form-text form-label text-nowrap">
+                                    Значення атрибута:
                                 </label>
                             </div>
                             <div class="col-6">
@@ -167,10 +166,7 @@
                                     name="thread_post_parameter{{ i }}_regex"
                                     value="True">
                                 <label for="thread_post_parameter{{ i }}_regex" class="form-check-label">
-                                    Does this value needs
-                                    <a href="https://en.wikipedia.org/wiki/Regular_expression">
-                                        regex?
-                                    </a>
+                                    Використати <a href="https://en.wikipedia.org/wiki/Regular_expression">regex</a>?
                                 </label>
                             </div>
                         </div>
@@ -182,25 +178,26 @@
                 </div>
 
 
-                <div class="row justify-content-center border border-light py-4">
+                <div class="row justify-content-center border-top py-4">
                     <div class="col col-4 border-end">
                         <label for="forum_threads_tag" class="h5 text-center mb-3">
-                            4.Forum's thread tag:
+                            4. Тег посилання на підтему:
                         </label>
                         <input type="text" id="forum_threads_tag" name="forum_threads_tag" class="form-control" required>
                         <small class="form-text text-muted">
-                            Input data about forum's threads module (this module MUST contain link to target thread)
+                            Ведіть назву контейнера, в якому містяться посилання на підтеми із повідомленнями. Праворуч ведіть атрибути.
                         </small>
+                        <img class="img-fluid" src="{{ url_for('static', filename='img/forumThreadTagExample.png')}}" alt="forumThreadTagExample.png">
                     </div>
                     <div class="col col-8">
                         {% for i in range(context['ftp_amm']) %}
                         <p class="h5 text-left mb-3">
-                            Input data for parameter {{ i+1 }}:
+                            Ведіть дані для атрибута {{ i+1 }}:
                         </p>
                         <div class="form-group row py-2">
                             <div class="col-2">
                                 <label for="forum_threads_parameter{{ i }}_name" class="form-text form-label">
-                                    Parameter name:
+                                    Назва атрибута:
                                 </label>
                             </div>
                             <div class="col-6">
@@ -210,8 +207,8 @@
                         </div>
                         <div class="form-group row py-2">
                             <div class="col-2">
-                                <label for="forum_threads_parameter{{ i }}_value" class="form-text form-label">
-                                    Parameter value:
+                                <label for="forum_threads_parameter{{ i }}_value" class="form-text form-label text-nowrap">
+                                    Значення атрибута:
                                 </label>
                             </div>
                             <div class="col-6">
@@ -223,10 +220,7 @@
                                     name="forum_threads_parameter{{ i }}_regex"
                                     value="True">
                                 <label for="forum_threads_parameter{{ i }}_regex" class="form-check-label">
-                                    Does this value needs
-                                    <a href="https://en.wikipedia.org/wiki/Regular_expression">
-                                        regex?
-                                    </a>
+                                    Використати<a href="https://en.wikipedia.org/wiki/Regular_expression">regex</a>?
                                 </label>
                             </div>
                         </div>
@@ -240,7 +234,7 @@
 
                 <div class="row justify-content-center py-3">
                     <button class="btn btn-lg btn-success d-block w-25">
-                        Submit
+                        Зберегти та перейти далі
                     </button>
                 </div>
             </form>
