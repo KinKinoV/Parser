@@ -84,7 +84,8 @@ def scrape_thread(current_thread:str, s:requests.Session)->None:
     forum_posts = soup.find_all(SITE_TAGS.thread_post_tag, SITE_TAGS.thread_post_parameter)
     if check_pagination:
         scrape_page(forum_posts)
-        check_same_ = Tag|NavigableString|None
+        check_same_link = Tag|NavigableString|None
+        check_same_title = Tag|NavigableString|None
         if PAGINATION_CASE == 'I':
             for i in range(2,5000):
                 html_text = str()
@@ -96,11 +97,13 @@ def scrape_thread(current_thread:str, s:requests.Session)->None:
                     html_text = s.get(current_thread+PAGINATAION_TEMPLATE.format(i)).text
                     sleep(PAGE_LOAD_DELAY)
                 thread_soup = BeautifulSoup(html_text, "html.parser")
-                check_same = thread_soup.find('link', {'rel' : 'canonical'})
-                if check_same_ == check_same:
+                check_same_1 = thread_soup.find('link', {'rel' : 'canonical'})
+                check_same_2 = thread_soup.find('title')
+                if (check_same_link == check_same_1) and (check_same_title == check_same_2):
                     break
                 else:
-                    check_same_ = check_same 
+                    check_same_link = check_same_1
+                    check_same_title = check_same_2
                     forum_posts = thread_soup.find_all(SITE_TAGS.thread_post_tag, SITE_TAGS.thread_post_parameter)
                     scrape_page(forum_posts)
         if PAGINATION_CASE == 'C':
@@ -114,11 +117,13 @@ def scrape_thread(current_thread:str, s:requests.Session)->None:
                     html_text = s.get(current_thread+PAGINATAION_TEMPLATE.format(i)).text
                     sleep(PAGE_LOAD_DELAY)
                 thread_soup = BeautifulSoup(html_text, "html.parser")
-                check_same = thread_soup.find('link', {'rel' : 'canonical'})
-                if check_same_ == check_same:
+                check_same_1 = thread_soup.find('link', {'rel' : 'canonical'})
+                check_same_2 = thread_soup.find('title')
+                if (check_same_link == check_same_1) and (check_same_title == check_same_2) :
                     break
                 else:
-                    check_same_ = check_same 
+                    check_same_link = check_same_1
+                    check_same_title = check_same_2 
                     forum_posts = thread_soup.find_all(SITE_TAGS.thread_post_tag, SITE_TAGS.thread_post_parameter)
                     scrape_page(forum_posts)
     else:
@@ -173,7 +178,8 @@ def scrape_forum(s:requests.Session, forum_url:str):
         print(f'{"-"*10}Страница 1 завершена{"-"*10}\n')
         del(soup)
         gc.collect()
-        check_same_ = Tag|NavigableString|None
+        check_same_link = Tag|NavigableString|None
+        check_same_title = Tag|NavigableString|None
         if PAGINATION_CASE == 'I':
             for i in range(2, 5000):
                 # Creating soup of the current page
@@ -186,12 +192,15 @@ def scrape_forum(s:requests.Session, forum_url:str):
                     forum_page = BeautifulSoup(s.get(forum_url+PAGINATAION_TEMPLATE.format(i)).text, "html.parser")
                     sleep(PAGE_LOAD_DELAY)
                 # Checking if we are on the last page
-                check_same = forum_page.find('link', {'rel' : 'canonical'})
-                if check_same_ == check_same:
+                check_same_1 = forum_page.find('link', {'rel' : 'canonical'})
+                check_same_2 = forum_page.find('title')
+                
+                if (check_same_link == check_same_1) and (check_same_title == check_same_2):
                     break
                 else:
                     # We are not on the last page, remembering unique info about current page...
-                    check_same_ = check_same
+                    check_same_link = check_same_1
+                    check_same_title = check_same_2
                     # ...and scraping it
                     scrape_forum_page(s, forum_page)
                     print(f'{"-"*10}Страница {i} завершена{"-"*10}\n')
@@ -208,12 +217,14 @@ def scrape_forum(s:requests.Session, forum_url:str):
                     forum_page = BeautifulSoup(s.get(forum_url+PAGINATAION_TEMPLATE.format(i)).text, "html.parser")
                     sleep(PAGE_LOAD_DELAY)
                 # Checking if we are on the last page
-                check_same = forum_page.find('link', {'rel' : 'canonical'})
-                if check_same_ == check_same:
+                check_same_1 = forum_page.find('link', {'rel' : 'canonical'})
+                check_same_2 = forum_page.find('title')
+                if (check_same_link == check_same_1) and (check_same_title == check_same_2):
                     break
                 else:
                     # We are not on the last page, remembering unique info about current page...
-                    check_same_ = check_same
+                    check_same_link = check_same_1
+                    check_same_title = check_same_2
                     # ...and scraping it
                     scrape_forum_page(s, forum_page)
                     print(f'{"-"*10}Страница {page} завершена{"-"*10}\n')
@@ -239,7 +250,6 @@ def scrape_setup()->bool:
     PAGE_LOAD_DELAY = SITE_TAGS.page_load_delay
     SEARCH_STRING = SITE_TAGS.search_string
     FORUM = SITE_TAGS.forum_link
-    print(f"{FORUM} this is a scrape_setup() print.")
 
     conn = sqlite3.connect('parser.db')
     print('Succesfuly opened DB!')
@@ -297,12 +307,18 @@ def parse()->None:
             return
     else:
         copy_cookies(s)
+
+    if not SITE_TAGS.bot_protection:
+        DRIVER.close()
     
     start_parse(s)
 
     print("Остановка скрипта...")
-
-    DRIVER.close()
+    
+    try:
+        DRIVER.close()
+    except Exception:
+        pass
     
 
 def start():
