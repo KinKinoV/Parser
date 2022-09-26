@@ -1,3 +1,4 @@
+from msilib.schema import File
 from flask import Flask, request, render_template, redirect, url_for
 import json
 
@@ -10,7 +11,7 @@ def start():
     app.run(host='0.0.0.0', debug=True)
 
 @app.route('/', methods=['GET', 'POST'])
-def get_first_data():
+def index():
     # Main page
     return render_template('index.html')
 
@@ -126,5 +127,27 @@ def show_results():
             to_pass['forum_step'] = data['forum_step']
     
     return render_template("result.html", context=to_pass)
+
+# Logic to save currently inputed data as a new template
+@app.route('/save_template')
+def save_template():
+
+    with open('data/parse_configs.json', 'r', encoding='utf-8') as file:
+        data = json.load(file)
+        link_ = data['forum_link']
+    if ('https://' in link_):
+        link_ = link_.replace('https://', '')
+    if ('http://' in link_):
+        link_ = link_.replace('http://', '')
+        
+    new_file_name = link_.split('/')[0]
+
+    try:
+        with open(f'data/saved_templates/{new_file_name}.json', 'x', encoding='utf-8') as new_file:
+            new_file.write(json.dumps(data))
+    except FileExistsError:
+        print(f"File {new_file_name}.json already exists!")
+
+    return redirect(url_for('index'))
 
 start()
