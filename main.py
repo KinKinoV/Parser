@@ -1,8 +1,9 @@
 from bs4 import BeautifulSoup, NavigableString, ResultSet, Tag
 from time import sleep
+import undetected_chromedriver as uc
 from selenium import webdriver
-from selenium.webdriver.firefox.service import Service
-from selenium.webdriver.firefox.options import Options
+# from selenium.webdriver.firefox.service import Service
+# from selenium.webdriver.firefox.options import Options
 import gc
 import parseconfigs
 import re
@@ -27,7 +28,7 @@ PAGE_LOAD_DELAY = float()
 SITE_TAGS = None
 # MAIN link to the forum
 FORUM = str()
-# Selenium driver to use (scripts uses geckodriver for FireFox)
+# Selenium driver to use
 DRIVER = None
 
 SEARCH_STRING = str()
@@ -251,7 +252,7 @@ def scrape_setup()->bool:
     SEARCH_STRING = SITE_TAGS.search_string
     FORUM = SITE_TAGS.forum_link
 
-    conn = sqlite3.connect('parser.db')
+    conn = sqlite3.connect('migrations/parser.db')
     print('Succesfuly opened DB!')
     # Name of file to save results to
     # Pulling banned words from the database
@@ -288,10 +289,9 @@ def parse()->None:
     global FORUM, DRIVER, SITE_TAGS
     scrape_setup()
 
-    options_ = Options()
+    options_ = uc.ChromeOptions()
     options_.page_load_strategy = 'eager'
-    s = Service("geckodriver.exe")
-    DRIVER = webdriver.Firefox(service=s, options=options_)
+    DRIVER = uc.Chrome(options=options_)
 
     # Получаю куки-файлы из селениума и передаю их скрипту для
     # удачных реквестов страниц 
@@ -300,23 +300,23 @@ def parse()->None:
 
     if SITE_TAGS.login_requirment:
         print('Пожалуйста, перейдите в новое окно, что открылось и войдите в аккаунт.\n')
-        if input('Вы завершили вход? Если да, введите [Д] : ') == 'Д':
+        if input('Вы завершили вход? Если да, введите [Y] : ') == 'Y':
             copy_cookies(s)
         else:
-            print("Вы ввели не 'Д'! Скрипт останавливается...")
+            print("Вы ввели не 'Y'! Скрипт останавливается...")
             return
     else:
         copy_cookies(s)
 
     if not SITE_TAGS.bot_protection:
-        DRIVER.close()
+        DRIVER.quit()
     
     start_parse(s)
 
     print("Остановка скрипта...")
     
     try:
-        DRIVER.close()
+        DRIVER.quit()
     except Exception:
         pass
     

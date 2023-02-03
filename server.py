@@ -15,6 +15,9 @@ def index():
     # Main page
     return render_template('index.html')
 
+@app.route('/from_saved', methods=['GET', 'POST'])
+def from_saved():
+    return render_template('choose_from_saved.html')
 
 @app.route('/tag_definition/<mp_amm>/<pp_amm>/<tp_amm>/<ftp_amm>', methods=["GET", "POST"])
 def get_tag_definition(mp_amm = 1, pp_amm = 1, tp_amm = 1, ftp_amm = 1):

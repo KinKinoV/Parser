@@ -10,3 +10,6 @@ geckodriver.log
 /data
 /results
 sqlite.py
+
+*.zip
+*.docx

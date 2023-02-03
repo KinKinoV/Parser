@@ -23,7 +23,11 @@ class ParseSettings:
 
     def __init__(self):
         with open('data\\parse_configs.json', 'r', encoding='utf-8') as file:
-            data = json.load(file)
+            try:
+                data = json.load(file)
+            except json.decoder.JSONDecodeError:
+                print(f"\n{'='*30}\nError in file {__name__}.py!!!\n{'='*30}\nSettings file .../data/parse_configs.json is empty!\n\n")
+                exit()
             regex_pattern = '/~/'
 
             self.message_tag = data['message_tag']
