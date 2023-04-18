@@ -1,0 +1,22 @@
+{% load static %}
+<nav class="navbar navbar-expand-lg navbar-light bg-success">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="{% url 'about' %}">
+        <img src="{% static 'parser/img/favicon.ico' %}" alt="" width="30" height="30">
+        {{ navbarTitle }}
+      </a>
+      <div class="collapse navbar-collapse" id="navbar">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'home' %}">{{ link1Title }}</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">{{ link2Title }}</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">{{ link3Title }}</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
