@@ -1,0 +1,83 @@
+{% extends 'parser/base_generic.html'%}
+{% load static %}
+{% block title %} <title>Parser | Tag Data</title> {% endblock title %}
+
+{% block content %}
+    <div class="container-xxl">
+        <h1 class="display-1 text-center my-3">Ведіть дані тегів:</h1>
+    </div>
+    <div class="container-xxl border border-3">
+        <form action="{% url 'newTags' %}" method="post" id="form">
+            {% csrf_token %}
+            <div class="row justify-content-center py-4">
+                <div class="col col-4 border-end">
+                    <label for="message_tag" class="h5 text-center mb-3">
+                        1. Тег повідомлення(поста):
+                    </label>
+                    <input type="text" id="message_tag" name="message_tag" class="form-control" placeholder="div, li, etc..." required>
+                    <small class="form-text text-muted">
+                        Ведіть назву тега, де знаходиться сам текст повідомлення(поста) форуму.
+                    </small>
+                    <img class="img-fluid" src="{% static 'parser/img/messageTagExample.png' %}" alt="messageTagExample.png">
+                </div>
+                <div class="col col-8">
+                    {% include 'parser/partials/formField.html' with parameterName="message" value="1" idNum="1"%}
+                </div>
+            </div>
+
+            <div class="row justify-content-center border-top py-4">
+                <div class="col col-4 border-end">
+                    <label for="pagination_tag" class="h5 text-center mb-3">
+                        2. Тег пагінації:
+                    </label>
+                    <input type="text" id="pagination_tag" name="pagination_tag" class="form-control" required>
+                    <small class="form-text text-muted">
+                        Ведіть назву тега, який відповідає за пагінацію форуму. Праворуч ведіть атрибути.
+                    </small>
+                    <img class="img-fluid" src="{% static 'parser/img/paginationTagExample.png' %}" alt="paginationTagExample.png">
+                </div>
+                <div class="col col-8">
+                    {% include 'parser/partials/formField.html' with parameterName="pagination" value="1" idNum="2"%}
+                </div>
+            </div>
+
+            <div class="row justify-content-center border-top py-4">
+                <div class="col col-lg-4 border-end">
+                    <label for="thread_post_tag" class="h5 text-center mb-3">
+                        3. Тег тіла поста форуму:
+                    </label>
+                    <input type="text" id="thread_post_tag" name="thread_post_tag" class="form-control" required>
+                    <small class="form-text text-muted">
+                        Ведіть назву тега, який відповідає за тіло поста форуму (тег повідомлення повинен бути присутній в цьому тегу). Праворуч ведіть атрибути цього тегу.
+                    </small>
+                    <img class="img-fluid" src="{% static 'parser/img/threadPostTagExample.png' %}" alt="threadPostTagExample.png">
+                </div>
+                <div class="col col-8">
+                    {% include 'parser/partials/formField.html' with parameterName="thread_post" value="1" idNum="3"%}
+                </div>
+            </div>
+
+            <div class="row justify-content-center border-top py-4">
+                <div class="col col-4 border-end">
+                    <label for="thread_link_tag" class="h5 text-center mb-3">
+                        4. Тег посилання на підтему:
+                    </label>
+                    <input type="text" id="thread_link_tag" name="thread_link_tag" class="form-control" required>
+                    <small class="form-text text-muted">
+                        Ведіть назву контейнера, в якому містяться посилання на підтеми із повідомленнями. Праворуч ведіть атрибути.
+                    </small>
+                    <img class="img-fluid" src="{% static 'parser/img/forumThreadTagExample.png' %}" alt="forumThreadTagExample.png">
+                </div>
+                <div class="col col-8">
+                    {% include 'parser/partials/formField.html' with parameterName="thread_link" value="1" idNum="4"%}
+                </div>
+            </div>
+
+            <div class="row justify-content-center py-3">
+                <button class="btn btn-lg btn-success d-block w-25">
+                    Зберегти та перейти далі
+                </button>
+            </div>
+        </form>
+    </div>
+{% endblock content %}
