@@ -5,7 +5,8 @@ urlpatterns = [
     path('', index, name='home'),
     path('savedTemps/', chooseFromSaved, name='chooseSaved'),
     path('tagData/', tagDataGet, name='newTags'),
-    path('about/', about, name='about') 
+    path('about/', about, name='about'),
+    path('results/', resultPage, name='results')
 ]
 
 htmx_urlpatterns = [
