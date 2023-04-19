@@ -1,5 +1,6 @@
 from django.shortcuts import render
-from .models import Forum
+from django.core.paginator import Paginator
+from .models import Forum, TgHandler
 import json
 
 def index(request):
@@ -51,6 +52,19 @@ def tagDataGet(request):
 def about(request):
     return render(request, 'parser/about.html')
 
+def resultPage(request):
+    user_list = TgHandler.objects.all().order_by('handler')
+
+    p = Paginator(TgHandler.objects.all(), 1)
+    page = request.GET.get('page')
+    users = p.get_page(page)
+    nums = ""*users.paginator.num_pages
+    context = {
+        'user_list': user_list,
+        'users': users,
+        'nums': nums
+    }
+    return render(request, 'parser/results.html', context)
 
 # HTMX functions
 def tagDataNewField(request):
