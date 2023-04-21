@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.core.paginator import Paginator
 from django.http import HttpResponseRedirect
-from .models import Forum, TgHandler
+from .models import Forum, Nickname
 import json
 
 def index(request):
@@ -77,9 +77,9 @@ def about(request):
     return render(request, 'parser/about.html')
 
 def resultPage(request):
-    user_list = TgHandler.objects.all().order_by('handler')
+    user_list = Nickname.objects.all().order_by('handler')
 
-    p = Paginator(TgHandler.objects.all(), 150)
+    p = Paginator(Nickname.objects.all(), 150)
     page = request.GET.get('page')
     users = p.get_page(page)
     nums = ""*users.paginator.num_pages

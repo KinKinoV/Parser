@@ -3,19 +3,19 @@
 {% block title %} <title>Results</title> {% endblock title %}
 
 {%block content%}
-
-<br/>
-    <h1>Results</h1>
+<h1 class="display-1 text-center">Results</h1>
 <table class="table table-striped table-hover table-bordered">
     <tr>
         <td>№</td>
         <td>Handler</td>
+        <td>Telegram Id</td>
         <td>Forum of origin</td>
     </tr>
     {%for user in users%}
         <tr>
             <td>{{user.id}}</td>
             <td>{{user.handler}}</td>
+            <td>{{user.user_id}}</td>
             <td><a href="{{user.forumOrigin}}">{{user.forumOrigin}}</a></td>
         </tr>
     {%endfor%}
