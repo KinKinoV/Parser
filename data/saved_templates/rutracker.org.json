@@ -1,0 +1,26 @@
+{
+    "message_tag": "div",
+    "message_parameter": {
+        "class": "post_body"
+    },
+    "pagination_tag": "span",
+    "pagination_parameter": {
+        "class": "pg-jump-menu"
+    },
+    "thread_post_tag": "tbody",
+    "thread_post_parameter": {
+        "id": "/~/post_.[0-9]*"
+    },
+    "forum_threads_tag": "span",
+    "forum_threads_parameter": {
+        "class": "topictitle"
+    },
+    "pagination_case": "C",
+    "thread_step": "30",
+    "forum_step": "50",
+    "pagination_template": "&start={}",
+    "bot_protection": "False",
+    "page_load_delay": "0",
+    "forum_link": "https://rutracker.org/forum/",
+    "login_requirment": "False"
+}

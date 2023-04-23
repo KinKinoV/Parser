@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css">
+    <link rel="shortcut icon" href="{{url_for('static', filename='img/favicon.ico')}}" type="image/x-icon">
+    <title>Parser | Index</title>
+</head>
+<body class="bg-dark text-light">
+    <div class="container-fluid ">
+        <h1 class="display-1 text-center m-3 p-2">Оберіть які налаштування використовувати</h1>
+        <div class="row justify-content-around m-5 p-5">
+            <a class="col-auto btn btn-success" id="tagData" href="{{ url_for('get_tag_definition', mp_amm = 1, pp_amm = 1, tp_amm = 1, ftp_amm = 1) }}">Вести нові</a>
+            <a class="col-auto btn btn-success" id="tagData" href="{{ url_for('from_saved') }}">Використати одне із збережених</a>
+        </div>
+    </div>
+</body>
+</html>
