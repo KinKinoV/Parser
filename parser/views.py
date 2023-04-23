@@ -1,8 +1,10 @@
+from typing import final
 from django.shortcuts import render
-from django.core.paginator import Paginator
+from django.core.paginator import Paginator,Page
 from django.http import HttpResponseRedirect
 from .models import Forum, Nickname
 import json
+from django.db.models import Q
 
 def index(request):
     return render(request, 'parser/index.html')
@@ -78,15 +80,16 @@ def about(request):
 
 def resultPage(request):
     user_list = Nickname.objects.all().order_by('handler')
-
-    p = Paginator(Nickname.objects.all(), 150)
+    p = Paginator(user_list.all(), 2)
     page = request.GET.get('page')
     users = p.get_page(page)
     nums = ""*users.paginator.num_pages
+    forums=(set(Nickname.objects.values_list('forumOrigin',flat=True)))
     context = {
         'user_list': user_list,
         'users': users,
-        'nums': nums
+        'nums': nums,
+        'forums':forums,
     }
     return render(request, 'parser/results.html', context)
 
@@ -107,3 +110,30 @@ def tagDataNewField(request):
             'idNum': swapId[parameter]
         }
         return render(request, 'parser/partials/formField.html', context)
+    
+    
+    
+def search_user(request):      
+    search_text = request.POST.get('search')
+    forum_of_origin = request.POST.get('forumfilter')
+    if search_text == None and forum_of_origin == None:
+        with open('bufferSearch.txt', 'r') as f:
+            txt=f.read()
+            components=txt.split(',')
+            search_text = components[0]
+            forum_of_origin = components[1]
+    final_results =  Nickname.objects.filter(Q(forumOrigin__link__icontains=forum_of_origin)&Q(handler__icontains=search_text)).order_by('id')
+    with open('bufferSearch.txt','w') as f:
+        f.write(f'{search_text},{forum_of_origin}')
+    p = Paginator(final_results, 1)
+    page = request.GET.get('spage')
+    search_users = p.get_page(page)
+    search_nums = ""*search_users.paginator.num_pages
+    forums=(set(Nickname.objects.values_list('forumOrigin',flat=True)))
+    context = {
+        'forums':forums,
+        'search_results':final_results,
+        'search_users': search_users,
+        'search_nums': search_nums,
+        }
+    return render(request, 'parser/partials/search_results.html', context)

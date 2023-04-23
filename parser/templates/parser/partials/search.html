@@ -1,0 +1,37 @@
+
+<table class="table table-dark table-borderless">
+    <tbody class="">
+    <tr>
+            <td> 
+                <center>
+                    <div class="mb-3">
+                    <form method=POST action="{%url 'search_user'%}">
+                        {% csrf_token %}
+                        <input type = "text"
+                            name = 'search'
+                            class = "form-control"
+                            placeholder = 'Введіть нікнейм користувача'>
+                        </input>
+                    <div class="row g-2">
+                        <div class="col-md">
+                            <div class="form-floating">
+                                <select 
+                                name="forumfilter" 
+                                class="form-control" 
+                                >
+                                    <option value=""></option>
+                                    {%for forum in forums%}
+                                    <option value="{{forum}}">{{forum}}</option>
+                                    {%endfor%}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <button class ='btn btn-outline-success' type="submit">Search</button> 
+                    </form>
+                </center>
+            </td>
+    </tr>
+</tbody>
+</table>
+<div id ='results'></div>
