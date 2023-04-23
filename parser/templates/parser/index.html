@@ -1,0 +1,14 @@
+{% extends 'parser/base_generic.html' %}
+
+{% block title%} <title>Parser | Home</title> {% endblock %}
+
+{% block content %}
+<body class="bg-dark text-light">
+    <div class="container-fluid ">
+        <h1 class="display-1 text-center m-3 p-2">Оберіть які налаштування використовувати</h1>
+        <div class="row justify-content-around m-5 p-5">
+            <a class="col-auto btn btn-success" id="tagData" href="{% url 'newTags'%}">Вести нові</a>
+            <a class="col-auto btn btn-success" id="chooseSaved" href="{% url 'chooseSaved' %}">Використати одне із збережених</a>
+    </div>
+</body>
+{% endblock content %}

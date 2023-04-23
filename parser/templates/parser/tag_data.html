@@ -1,0 +1,188 @@
+{% extends 'parser/base_generic.html'%}
+{% load static %}
+{% block title %} <title>Parser | Tag Data</title> {% endblock title %}
+
+{% block content %}
+    <div class="container-fluid">
+        <h1 class="display-1 text-center my-3">Ведіть дані тегів:</h1>
+    </div>
+    <div class="container-fluid border border-3">
+        <form action="{% url 'newTags' %}" method="post" id="form">
+            {% csrf_token %}
+            <div class="row justify-content-center py-4">
+                <div class="col col-4 border-right">
+                    <label for="message_tag" class="h5 text-center mb-3">
+                        1. Тег повідомлення(поста):
+                    </label>
+                    <input type="text" id="message_tag" name="message_tag" class="form-control" placeholder="div, li, etc..." required>
+                    <small class="form-text text-muted">
+                        Ведіть назву тега, де знаходиться сам текст повідомлення(поста) форуму.
+                    </small>
+                    <img class="img-fluid" src="{% static 'parser/img/messageTagExample.png' %}" alt="messageTagExample.png">
+                </div>
+                <div class="col col-8">
+                    {% include 'parser/partials/formField.html' with parameterName="message" value="1" idNum="1"%}
+                </div>
+            </div>
+
+            <div class="row justify-content-center border-top py-4">
+                <div class="col col-4 border-right">
+                    <label for="pagination_tag" class="h5 text-center mb-3">
+                        2. Тег пагінації:
+                    </label>
+                    <input type="text" id="pagination_tag" name="pagination_tag" class="form-control" required>
+                    <small class="form-text text-muted">
+                        Ведіть назву тега, який відповідає за пагінацію форуму. Праворуч ведіть атрибути.
+                    </small>
+                    <img class="img-fluid" src="{% static 'parser/img/paginationTagExample.png' %}" alt="paginationTagExample.png">
+                </div>
+                <div class="col col-8">
+                    {% include 'parser/partials/formField.html' with parameterName="pagination" value="1" idNum="2"%}
+                </div>
+            </div>
+
+            <div class="row justify-content-center border-top py-4">
+                <div class="col col-lg-4 border-right">
+                    <label for="thread_post_tag" class="h5 text-center mb-3">
+                        3. Тег тіла поста форуму:
+                    </label>
+                    <input type="text" id="thread_post_tag" name="thread_post_tag" class="form-control" required>
+                    <small class="form-text text-muted">
+                        Ведіть назву тега, який відповідає за тіло поста форуму (тег повідомлення повинен бути присутній в цьому тегу). Праворуч ведіть атрибути цього тегу.
+                    </small>
+                    <img class="img-fluid" src="{% static 'parser/img/threadPostTagExample.png' %}" alt="threadPostTagExample.png">
+                </div>
+                <div class="col col-8">
+                    {% include 'parser/partials/formField.html' with parameterName="thread_post" value="1" idNum="3"%}
+                </div>
+            </div>
+
+            <div class="row justify-content-center border-top py-4">
+                <div class="col col-4 border-right">
+                    <label for="thread_link_tag" class="h5 text-center mb-3">
+                        4. Тег посилання на підтему:
+                    </label>
+                    <input type="text" id="thread_link_tag" name="thread_link_tag" class="form-control" required>
+                    <small class="form-text text-muted">
+                        Ведіть назву контейнера, в якому містяться посилання на підтеми із повідомленнями. Праворуч ведіть атрибути.
+                    </small>
+                    <img class="img-fluid" src="{% static 'parser/img/forumThreadTagExample.png' %}" alt="forumThreadTagExample.png">
+                </div>
+                <div class="col col-8">
+                    {% include 'parser/partials/formField.html' with parameterName="thread_link" value="1" idNum="4"%}
+                </div>
+            </div>
+            <!-- First row -->
+            <div class="row justify-content-start border-top py-3 px-3">
+
+                <!-- paginationTemplate (input : str) -->
+                <div class="col-6 row container-sm border-right">
+                    <div class="col-4 text-nowrap text-end my-2 py-1">
+                        <label class="m-2 form-input-label" for="paginationTemplate">Шаблон пагинації: </label>
+                    </div>
+                    <div class="col-7 offset-sm-1 my-3">
+                        <input type="text" id="paginationTemplate" name="paginationTemplate" class="form-control" required>
+                    </div>
+                    <small class="text-muted mx-2 py-0 my-0">Ваш шаблон повинен повторюватися при будь-якому переході сторінок, і та частина, яка змінюється(номер сторінки) повинна бути замінена на "{}". Замість фігурних лапок пізніше будть підставлятися номера сторінок.</small>
+                    <small class="text-muted mx-2 py-0 my-0">Приклади правильного шаблону: "page-{}" (для зображення знизу), "&st={}".</small>
+                    <img src="{% static 'parser/img/paginationExample.gif' %}" alt="paginationTemplateExample.png" class="img-fluid mx-2 py-0 my-0">
+                </div>
+
+                <!-- paginationCase (select : ['I', 'C']) -->
+                <div class="col-6 row container-sm mx-2">
+                    <div class="col-4 my-2 py-1">
+                        <label class="form-select-label m-2" for="paginationCase">Тип пагінації:</label>
+                    </div>
+                    <div class="col-8 my-2 py-1">
+                        <select name="paginationCase" id="paginationCase" class="form-select" required>
+                            <option class="text-muted disabled">Оберіть тип...</option>
+                            <option value="I">Збільшення значення (../page-1, ../page-2, etc.)</option>
+                            <option value="C">Кількість елементів (../&st=35, ../&st=70, etc.)</option>
+                        </select>
+                    </div>
+
+                    <!-- if paginationCase == 'C': -->
+                    <div class="col-6 row my-2 py-1" id="step" style="visibility: hidden">
+                        <!-- forumStep (input : int) -->
+                        <div class="col-8">
+                            <label class="form-input-label" for="forumStep">Кількість елементів у темі</label>
+                        </div>
+                        <div class="col-4">
+                            <input type="text" id="forumStep" name="forumStep" class="form-control my-1 py-1">
+                        </div>
+                        
+                        <!-- threadStep (input : int) -->
+                        <div class="col-8">
+                            <label class="form-input-label" for="threadStep">Кількість елементів у підфорумі</label>
+                        </div>
+                        <div class="col-4">
+                            <input type="text" id="threadStep" name="threadStep" class="form-control my-1 py-1">
+                        </div>
+                    </div>
+                    <div class="col-6 row" id="paginationExplanation" style="visibility: hidden">
+                        <small class="col-12 text-muted mx-2">В цих полях потрібно ввести, скільки елементів(у темі чи в підтемі) відображається на одній сторінці. Кількість елементів можна побачити у першому значенні шаблону сторінки, що ви вели ліворуч.</small>
+                        <small class="col-12 text-muted mx-2">Наприклад: у "&st=35", 35 -- це значення кількості елементів у темі/підфорумі, в залежності де ви дивилися.</small>
+                    </div>
+                    <script src="{% static 'parser/js/stepShow.js' %}"></script>
+                    <!-- endif -->
+
+                </div>
+
+            </div>
+
+            <!-- Second row -->
+            <div class="row justify-content-start border-top py-3 px-3">
+                <!-- botProtection (checkbox : bool) -->
+                <div class="col-6 row container-sm border-right mt-2">
+                    <div class="col-1 mt-3">
+                        <input type="checkbox" class="form-check-input mx-4" id="botProtection" name="botProtection" value="True">
+                    </div>
+                    <div class="col-3 text-start text-nowrap mt-2">
+                        <label class="form-check-label mt-2" for="botProtection">Захист від ботів</label>
+                    </div>
+                    <small class="col-12 text-muted m-2">Позначте цей пункт, якщо для цільового форуму потрібно завантажувати сторінки тільки через браузер.</small>
+                </div>
+
+                <!-- pageLoadDelay (input : int)-->
+                <div class="col-6 row container-sm mx-2">
+                    <div class="col-4 mt-3">
+                        <label class="form-control-label mb-0" for="pageLoadDelay">Затримка між запитами (у секундах)</label>
+                    </div>
+                    <div class="col-4">
+                        <input class="form-control mt-3 mb-0" type="text" id="pageLoadDelay" name="pageLoadDelay" value="0" required>
+                    </div>
+                    <small class="col-12 text-muted">Якщо потрібно, введіть скільки секунд треба чекати між запитами на сторінки форуму. Можна вводити значення із точкою(наприклад: 0.3).</small>
+                </div>
+            </div>
+
+            <!-- Third row -->
+            <div class="row justify-content-center border-top border-bottom p-3">
+                <!-- forumLink : str(input) -->
+                <div class="col-7 row justify-content-start my-3">
+                    <div class="col-4 text-start my-3 py-1">
+                        <label class="form-label" for="forumLink">Ведіть посилання на форум (разом із https:// чи http://)</label>
+                    </div>
+                    <div class="col-7 my-3 py-1">
+                        <input class="form-control" type="text" id="forumLink" name="forumLink" required>
+                    </div>
+                </div>
+
+                <!-- loginRequirment : bool(checkbox) -->
+                <div class="col-2 row justify-content-start my-3">
+                    <div class="col-2 my-3 py-1">
+                        <input class="form-check-input" type="checkbox" id="loginRequirment" name="loginRequirment" value="True">
+                    </div>
+                    <div class="col-9 my-3 py-1">
+                        <label class="form-check-label" for="loginRequirment">Чи обов'язково війти в систему для парсу?</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row justify-content-center py-3">
+                <button class="btn btn-lg btn-success d-block w-25">
+                    Зберегти та перейти далі
+                </button>
+            </div>
+        </form>
+    </div>
+{% endblock content %}
