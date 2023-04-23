@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="shortcut icon" href="{{url_for('static', filename='img/favicon.ico')}}" type="image/x-icon">
+    <title>Parser | Saved Data</title>
+</head>
+<body class="bg-dark text-light">
+    
+    <div class="container-xxl">
+        <h1 class="display-1 text-center">Saved data</h1>
+    </div>
+    
+    <div class="container-xxl">
+        <div class="row justify-content-around">
+            <table class = "table table-bordered w-auto text-left border-secondary text-light">
+                <thead>
+                    <tr class="table-primary">
+                        <th scope="col">#</th>
+                        <th scope="col">Tag</th>
+                        <th scope="col">Parameter(s)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <th scope="row">1</th>
+                        <td>{{ context['message_tag'] }}</td>
+                        <td>
+                            {% for parameter in context['message_parameter'] %}
+                                {{ parameter }} = "{{context['message_parameter'][parameter]}}", 
+                            {% endfor %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">2</th>
+                        <td>{{ context['pagination_tag'] }}</td>
+                        <td>
+                            {% for parameter in context['pagination_parameter'] %}
+                                {{ parameter }} = "{{context['pagination_parameter'][parameter]}}", 
+                            {% endfor %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">3</th>
+                        <td>{{ context['thread_post_tag'] }}</td>
+                        <td>
+                            {% for parameter in context['thread_post_parameter'] %}
+                                {{ parameter }} = "{{context['thread_post_parameter'][parameter]}}",
+                            {% endfor %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">4</th>
+                        <td>{{ context['forum_threads_tag'] }}</td>
+                        <td>
+                            {% for parameter in context['forum_threads_parameter'] %}
+                                {{ parameter }} = "{{context['forum_threads_parameter'][parameter]}}",
+                            {% endfor %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">5</th>
+                        <td>Pagination Case</td>
+                        <td>{{ context['pagination_case'] }}</td>
+                    </tr>
+                    {% if context['pagination_case'] == 'C' %}
+                    <tr>
+                        <th scope="row">5.1</th>
+                        <td>Thread step</td>
+                        <td>{{ context['thread_step'] }}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">5.2</th>
+                        <td>Forum step</td>
+                        <td>{{ context['forum_step'] }}</td>
+                    </tr>
+                    {% endif %}
+                    <tr>
+                        <th scope="row">6</th>
+                        <td>Pagination template</td>
+                        <td>{{ context['pagination_template'] }}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">7</th>
+                        <td>Page load delay</td>
+                        <td>{{ context['page_load_delay'] }}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">8</th>
+                        <td>Forum link</td>
+                        <td><a href="{{ context['forum_link'] }}">{{ context['forum_link'] }}</a></td>
+                    </tr>
+                    <tr>
+                        <th scope="row">9</th>
+                        <td>Login requirment</td>
+                        <td>{{ context['login_requirment'] }}</td>
+                    </tr>
+                </tbody>    
+            </table>
+        </div>
+        <div class="row justify-content-around">
+            <a class="col-auto btn btn-success" href="{{ url_for('save_template') }}">Зберегти ці налаштування</a>
+        </div>
+    </div>
+</body>
+</html>

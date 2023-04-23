@@ -1,0 +1,24 @@
+{
+    "message_tag": "div",
+    "message_parameter": {
+        "class": "bbWrapper"
+    },
+    "pagination_tag": "ul",
+    "pagination_parameter": {
+        "class": "pageNav-main"
+    },
+    "thread_post_tag": "article",
+    "thread_post_parameter": {
+        "class": "message-body js-selectToQuote"
+    },
+    "forum_threads_tag": "div",
+    "forum_threads_parameter": {
+        "class": "structItem-title"
+    },
+    "pagination_case": "I",
+    "pagination_template": "page-{}",
+    "bot_protection": "True",
+    "page_load_delay": "0",
+    "forum_link": "https://s3.piratebuhta.info",
+    "login_requirment": "True"
+}
