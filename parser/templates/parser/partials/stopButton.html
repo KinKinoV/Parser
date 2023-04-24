@@ -1,0 +1,25 @@
+<div class="col-6 border-right" id="stopForm">
+    {% if login_check %}
+        <div class="form-check col text-center">
+            <input type="checkbox" 
+            name="loginCheck" 
+            id="loginCheck" 
+            class="form-check-input" 
+            hx-trigger="click" 
+            hx-post="/login_check/" 
+            hx-target="#stopForm"
+            hx-swap="outerHTML" 
+            value="True">
+            <label for="loginCheck" class="form-check-label">Ви виконали вхід в аккаунт на форумі?</label>
+        </div>
+    {% endif %}
+    <div class="col text-center" id="stopButton">
+        <input type="button"  
+        class="btn btn-danger btn-lg" 
+        value="Зупинити" 
+        hx-patch="/stop_parse/" 
+        hx-trigger="click" 
+        hx-target="#stopForm" 
+        hx-swap="outerHTML">
+    </div>
+</div>
