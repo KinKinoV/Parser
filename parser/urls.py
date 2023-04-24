@@ -8,7 +8,8 @@ urlpatterns = [
     path('tagData/', tagDataGet, name='newTags'),
     path('about/', about, name='about'),
     path('results/', resultPage, name='results'),
-    path('parsing/', parsing, name='parsing')
+    path('parsing/', parsing, name='parsing'),
+    path('search_user/', search_user, name='search_user')
 ]
 
 htmx_urlpatterns = [

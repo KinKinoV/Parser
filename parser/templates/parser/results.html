@@ -1,35 +1,42 @@
+<div name="search_result_user" id="search_result_user">
 {% extends 'parser/base_generic.html' %}
 
 {% block title %} <title>Results</title> {% endblock title %}
 
 {%block content%}
-<h1 class="display-1 text-center">Results</h1>
-<table class="table table-striped table-hover table-bordered">
-    <tr>
-        <td>№</td>
-        <td>Handler</td>
-        <td>Telegram Id</td>
-        <td>Forum of origin</td>
-    </tr>
-    {%for user in users%}
+
+<h1 class="display-1 text-center">Результати</h1>
+</br>
+<section>
+    {% include 'parser/partials/search.html' %}
+</section>
+<div id="results_user" name="results_user">
+    <table class="table table-striped table-hover table-bordered">
         <tr>
-            <td>{{user.id}}</td>
-            <td>{{user.handler}}</td>
-            <td>{{user.user_id}}</td>
-            <td><a href="{{user.forumOrigin}}">{{user.forumOrigin}}</a></td>
+            <td>№</td>
+            <td>Handler</td>
+            <td>Telegram Id</td>
+            <td>Forum of origin</td>
         </tr>
-    {%endfor%}
-</table>
+        {%for user in users%}
+            <tr>
+                <td>{{user.id}}</td>
+                <td>{{user.handler}}</td>
+                <td>{{user.user_id}}</td>
+                <td><a href="{{user.forumOrigin}}">{{user.forumOrigin}}</a></td>
+            </tr>
+        {%endfor%}
+    </table>
 <br/>
 <br/>
 
 <nav aria-label="Page navigation example">
+<div name="results_page">
 <ul class="pagination justify-content-center">
 {%if users.has_previous%}
 <li class="page-item"><a class="btn btn-success" href="?page=1">&laquo First</a></li>
 <li class="page-item"><a class="btn btn-success" href="?page={{users.previous_page_number}}">Previous</a></li>
 {%endif%}
-
 {%for i in nums %}
 <li class="page-item"><a class="page-link" href="?page={{forloop.counter}}">{{forloop.counter}}</a></li>
 {%endfor%}
@@ -38,10 +45,12 @@
 <li class="page-item"><a class="btn btn-success" href="?page={{users.paginator.num_pages}}">Last &raquo</a></li>
 {%endif%}
 </ul>
+</div>
 </nav>
 
 <br/>
 {{nums}}
+</div>
     <center>
         <br/>
         <br/>
@@ -49,3 +58,4 @@
         Copyright(c)
     </center>
 {%endblock%}
+</div>
