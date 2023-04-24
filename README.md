@@ -17,3 +17,5 @@
 Виртуальная машина по ссылке:
 
 [http://localhost:7900/?autoconnect=1&resize=scale&password=secret](http://localhost:7900/?autoconnect=1&resize=scale&password=secret)
+
+Для получения `keys.py` нужного для запуска сайта, писать в телеграм [@KinKinoV](https://t.me/KinkinoV).
