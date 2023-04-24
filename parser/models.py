@@ -2,7 +2,7 @@ from django.db import models
 
 class Forum(models.Model):
     link = models.CharField(max_length=100, unique=True)
-    parseConfigs = models.TextField(unique=True, null=True)
+    parseConfigs = models.TextField(null=True)
 
     def __str__(self) -> str:
         return self.link
