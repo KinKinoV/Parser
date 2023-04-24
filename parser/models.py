@@ -17,6 +17,16 @@ class Nickname(models.Model):
     def __str__(self) -> str:
         return self.handler
 
-class BannedWord(models.Model):
-    filter = models.CharField(max_length=50, unique=True, help_text='Word/statement to exclude in search')
+class BannedFilter(models.Model):
+    filter = models.TextField(help_text='Word/statement to exclude in search')
     purpose = models.CharField(max_length=50, help_text="For/Для ...")
+
+    def __str__(self) -> str:
+        return self.purpose
+
+class KeyWordFilter(models.Model):
+    filter = models.TextField(help_text='Word/statement which implies that needed information is in the forum message')
+    purpose = models.CharField(max_length=50, help_text="Example: For Telegram")
+
+    def __str__(self) -> str:
+        return self.purpose

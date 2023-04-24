@@ -16,7 +16,12 @@ class NicknameAdmin(admin.ModelAdmin):
     list_display = ('handler', 'user_id', 'nicknames', 'forumOrigin')
     fields = ['forumOrigin', 'handler', 'user_id', 'nicknames']
 
-@admin.register(BannedWord)
-class BannedWordAdmin(admin.ModelAdmin):
-    list_display = ('filter', 'purpose')
+@admin.register(BannedFilter)
+class BannedFilterAdmin(admin.ModelAdmin):
+    list_display = ('purpose', 'filter')
+    fields = ['filter', 'purpose']
+
+@admin.register(KeyWordFilter)
+class KeyWordFilterAdmin(admin.ModelAdmin):
+    list_display = ('purpose', 'filter')
     fields = ['filter', 'purpose']

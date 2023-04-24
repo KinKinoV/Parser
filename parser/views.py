@@ -1,8 +1,10 @@
 from typing import final
 from django.shortcuts import render
-from django.core.paginator import Paginator,Page
-from django.http import HttpResponseRedirect
-from .models import Forum, Nickname
+from django.core.paginator import Paginator, Page
+from django.http import HttpResponseRedirect, HttpResponse
+from threading import Thread
+from .parser import parse, kill_parse, SITE_MESSAGES, PARSER_WORK
+from .models import Forum, Nickname, BannedFilter
 import json
 from django.db.models import Q
 
@@ -79,19 +81,29 @@ def about(request):
     return render(request, 'parser/about.html')
 
 def resultPage(request):
-    user_list = Nickname.objects.all().order_by('handler')
-    p = Paginator(user_list.all(), 2)
+    p = Paginator(Nickname.objects.all(), 100)
     page = request.GET.get('page')
     users = p.get_page(page)
     nums = ""*users.paginator.num_pages
     forums=(set(Nickname.objects.values_list('forumOrigin',flat=True)))
     context = {
-        'user_list': user_list,
         'users': users,
         'nums': nums,
         'forums':forums,
     }
     return render(request, 'parser/results.html', context)
+
+def parsing(request):
+    context = {
+        'forums': Forum.objects.all().order_by('link'),
+        'filters' : BannedFilter.objects.all().order_by('purpose'),
+    }
+
+    if request.method == 'PATCH':
+        return render(request, 'parser/partials/parsingForm.html', context)
+    
+    
+    return render(request, 'parser/parse_page.html', context)
 
 # ============================================[ HTMX functions ]============================================ #
 def tagDataNewField(request):
@@ -110,9 +122,36 @@ def tagDataNewField(request):
             'idNum': swapId[parameter]
         }
         return render(request, 'parser/partials/formField.html', context)
+
+def startParse(request):
+    context = {}
+    if request.method == 'POST':
+        link = request.POST.get('linkSelect')
+        toParse = request.POST.get('linksToParse')
+        resultFilter = request.POST.get('filterSelect')
+        # Обязательно name в будущем сделать с учётом присутствия нескольких пользователей
+        Thread(target=parse, args=[link, toParse, resultFilter], name='ParserThread').start()
+        if '"login_requirment": "True"' in Forum.objects.get(link=link).parseConfigs:
+            context['login_check'] = True
+        return render(request, 'parser/partials/stopButton.html', context)
+
+def stopParse(request):
+    if request.method == "PATCH":
+        kill_parse()
+        context = {
+            'forums': Forum.objects.all().order_by('link'),
+            'filters' : BannedFilter.objects.all().order_by('purpose')
+        }
+        return render(request, 'parser/partials/parsingForm.html', context)
     
-    
-    
+def getProgressText(request):
+    if request.method == "GET":
+        if SITE_MESSAGES == []:
+            text_to_pass = "No messages"
+        else:
+            text_to_pass = SITE_MESSAGES[len(SITE_MESSAGES)-1]
+        return HttpResponse(f"{text_to_pass}")
+
 def search_user(request):      
     search_text = request.POST.get('search')
     forum_of_origin = request.POST.get('forumfilter')
