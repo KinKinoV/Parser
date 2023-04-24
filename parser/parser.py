@@ -1,8 +1,8 @@
 from bs4 import BeautifulSoup, NavigableString, ResultSet, Tag
 from time import sleep
 from selenium import webdriver
-import django
-django.setup()
+from django import setup
+setup()
 from django.shortcuts import render
 from django.http import HttpResponse
 from .models import Forum, Nickname, BannedFilter, KeyWordFilter
