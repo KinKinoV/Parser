@@ -5,10 +5,13 @@
 {% block content %}
 <body class="bg-dark text-light">
     <div class="container-fluid ">
-        <h1 class="display-1 text-center m-3 p-2">Оберіть які налаштування використовувати</h1>
-        <div class="row justify-content-around m-5 p-5">
-            <a class="col-auto btn btn-success" id="tagData" href="{% url 'newTags'%}">Вести нові</a>
-            <a class="col-auto btn btn-success" id="chooseSaved" href="{% url 'chooseSaved' %}">Використати одне із збережених</a>
+        <h1 class="display-1 text-center m-3 p-2">Парсер форумів</h1>
+        <div class="row">
+            <ul class="display-4 col text-center my-2 py-2 ">Оберіть що робити:</ul>
+        </div>
+        <div class="row justify-content-around mx-5 my-2 px-5 py-2">
+            <a class="col-auto btn btn-success" id="tagData" href="{% url 'newTags'%}">Вести новий шаблон парсу</a>
+            <a class="col-auto btn btn-success" id="startParse" href="{% url 'parsing' %}">Почати парсинг</a>
     </div>
 </body>
 {% endblock content %}
