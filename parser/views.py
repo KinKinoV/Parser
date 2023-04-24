@@ -164,7 +164,7 @@ def search_user(request):
     final_results =  Nickname.objects.filter(Q(forumOrigin__link__icontains=forum_of_origin)&Q(handler__icontains=search_text)).order_by('id')
     with open('bufferSearch.txt','w') as f:
         f.write(f'{search_text},{forum_of_origin}')
-    p = Paginator(final_results, 1)
+    p = Paginator(final_results, 100)
     page = request.GET.get('spage')
     search_users = p.get_page(page)
     search_nums = ""*search_users.paginator.num_pages
