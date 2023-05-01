@@ -16,6 +16,16 @@
           <li class="nav-item">
             <a class="nav-link" href="{% url 'parsing' %}">{{ link3Title }}</a>
           </li>
+          {%if user_list %}
+          <li>
+            <a class="nav-link" href="{%url 'save_as_csv' %}">Зберегти дані як csv</a>
+          </li>
+          {%endif%}
+          {%if search_results %}
+          <li>
+            <a class="nav-link" href="{%url 'save_search_csv' %}">Зберегти дані як csv</a>
+          </li>
+          {%endif%}
         </ul>
       </div>
     </div>
