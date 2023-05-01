@@ -105,6 +105,32 @@ def parsing(request):
     
     return render(request, 'parser/parse_page.html', context)
 
+def save_result(request):
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename=result_user.csv'
+    writer = csv.writer(response)
+    writer.writerow(['Id','Handler','Telegram Id','Nicknames','Forum of origin',])
+    users=Nickname.objects.all()
+    for user in users:
+        writer.writerow([user.id, user.handler, user.user_id, user.nicknames, user.forumOrigin,])
+    return response
+
+def save_search_results(request):
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename=result_user.csv'
+    writer = csv.writer(response)
+    writer.writerow(['Id','Handler','Telegram Id','Nicknames','Forum of origin',])
+    with open('bufferSearch.txt', 'r') as f:
+        txt=f.read()
+        components=txt.split(',')
+        search_text = components[0]
+        forum_of_origin = components[1]
+    user_results =  Nickname.objects.filter(Q(forumOrigin__link__icontains=forum_of_origin)&Q(handler__icontains=search_text)).order_by('id')
+    for user in user_results:
+            writer.writerow([user.id, user.handler, user.user_id, user.nicknames, user.forumOrigin,])
+    return response
+    
+
 # ============================================[ HTMX functions ]============================================ #
 def tagDataNewField(request):
     if request.method == 'GET':
