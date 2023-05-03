@@ -1,52 +1,90 @@
-<div name="search_result_user" id="search_result_user">
 {% extends 'parser/base_generic.html' %}
 
 {% block title %} <title>Results</title> {% endblock title %}
+{% load static %}
+{% block additionalStatic %}
+<style>
+    .button-img {
+        opacity: 0
+    }
+    td:hover .button-img { opacity: 1;}
+</style>
+{% endblock additionalStatic %}
 
-{%block content%}
-
+{% block content %}
 <h1 class="display-1 text-center">Результати</h1>
 </br>
 <section>
     {% include 'parser/partials/search.html' %}
 </section>
-<div id="results_user" name="results_user">
-    <table class="table table-striped table-hover table-bordered">
-        <tr>
-            <td>№</td>
-            <td>Handler</td>
-            <td>Telegram Id</td>
-            <td>Forum of origin</td>
-        </tr>
-        {%for user in users%}
-            <tr>
-                <td>{{user.id}}</td>
-                <td>{{user.handler}}</td>
-                <td>{{user.user_id}}</td>
-                <td><a href="{{user.forumOrigin}}">{{user.forumOrigin}}</a></td>
-            </tr>
-        {%endfor%}
-    </table>
-<br/>
-<br/>
+<div id="results_user" name="results_user" class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-auto">
+            <table class="table table-bordered text-light">
+                <tr class="text-center">
+                    <td>№</td>
+                    <td>Handler</td>
+                    <td>Telegram Id</td>
+                    <td>Forum of origin</td>
+                </tr>
+                {%for user in users%}
+                    <tr>
+                        <td class="text-center">{{ user.id }}</td>
+                        <td class="container-fluid">
+                            <div class="row justify-content-around">
+                                <div class="col-8">{{user.handler}}</div>
+                                <div class="col-1">
+                                    <button type="button" 
+                                            hx-get="/delete_handler/{{user.id}}/?{{request.META.QUERY_STRING}}" 
+                                            class="bg-transparent border-0 text-center">
+                                        <img src="{% static 'parser/img/red_cross.png'%}" class="button-img">
+                                    </button>
+                                </div>
+                                <div class="col-1">
+                                    <button type="button" 
+                                            hx-get="/add_to_keys/{{user.id}}/?{{request.META.QUERY_STRING}}" 
+                                            class="bg-transparent border-0 text-center">
+                                        <img src="{% static 'parser/img/green_plus.png'%}" class="button-img">
+                                    </button>
+                                </div>
+                                <div class="col-1">
+                                    <button type="button" 
+                                            hx-get="/add_to_banned/{{user.id}}/?{{request.META.QUERY_STRING}}" 
+                                            class="bg-transparent border-0 text-center">
+                                        <img src="{% static 'parser/img/red_plus.png'%}" class="button-img">
+                                    </button>
+                                </div>
+                            </div>
+                        </td>
+                        <td>{{user.user_id}}</td>
+                        <td><a href="{{user.forumOrigin}}">{{user.forumOrigin}}</a></td>
+                    </tr>
+                {%endfor%}
+            </table>
+        </div>
+    </div>
 
-<nav aria-label="Page navigation example">
-<div name="results_page">
-<ul class="pagination justify-content-center">
-{%if users.has_previous%}
-<li class="page-item"><a class="btn btn-success" href="?page=1">&laquo First</a></li>
-<li class="page-item"><a class="btn btn-success" href="?page={{users.previous_page_number}}">Previous</a></li>
-{%endif%}
-{%for i in nums %}
-<li class="page-item"><a class="page-link" href="?page={{forloop.counter}}">{{forloop.counter}}</a></li>
-{%endfor%}
-{%if users.has_next%}
-<li class="page-item"><a class="btn btn-success" href="?page={{users.next_page_number}}">next</a></li>
-<li class="page-item"><a class="btn btn-success" href="?page={{users.paginator.num_pages}}">Last &raquo</a></li>
-{%endif%}
-</ul>
+    <br/>
+    <br/>
+
+    <nav aria-label="Page navigation example">
+        <div name="results_page">
+            <ul class="pagination justify-content-center">
+                {%if users.has_previous%}
+                <li class="page-item"><a class="btn btn-success" href="?page=1">&laquo First</a></li>
+                <li class="page-item"><a class="btn btn-success" href="?page={{users.previous_page_number}}">Previous</a></li>
+                {%endif%}
+                {%for i in nums %}
+                <li class="page-item"><a class="page-link" href="?page={{forloop.counter}}">{{forloop.counter}}</a></li>
+                {%endfor%}
+                {%if users.has_next%}
+                <li class="page-item"><a class="btn btn-success" href="?page={{users.next_page_number}}">next</a></li>
+                <li class="page-item"><a class="btn btn-success" href="?page={{users.paginator.num_pages}}">Last &raquo</a></li>
+                {%endif%}
+            </ul>
+        </div>
+    </nav>
 </div>
-</nav>
 
 <br/>
 {{nums}}
