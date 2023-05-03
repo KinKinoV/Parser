@@ -9,9 +9,10 @@
 <div class="container-fluid border-top border-3 my-5" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
     <div class="row py-3">
         {% include 'parser/partials/parsingForm.html' %}
-        <div class="col-5"
+        <div class="col-5 bg-success mx-auto"
+            style="--bs-bg-opacity: .5"
             hx-get="{% url 'getProgressText' %}"
-            hx-trigger="every 1s"
+            hx-trigger="every 1.5s"
             hx-swap="innerHTML">
             
         </div>
