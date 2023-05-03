@@ -1,6 +1,7 @@
 from bs4 import BeautifulSoup, NavigableString, ResultSet, Tag
 from time import sleep
 from selenium import webdriver
+from collections import deque
 from django import setup
 setup()
 from django.shortcuts import render
@@ -92,7 +93,7 @@ class ParseSettings:
             self.login_requirment = True
 
 def parse(*args)->None:
-    global DRIVER, FORUM_SETTINGS, LOGIN_REQ, SITE_MESSAGES, PARSER_WORK
+    global DRIVER, FORUM_SETTINGS, LOGIN_REQ, SITE_MESSAGES
     FORUM_SETTINGS = ParseSettings(args[0])
     scrape_setup(args[1], args[2])
 
@@ -118,9 +119,11 @@ def parse(*args)->None:
         DRIVER.quit()
     
     start_parse(s)
-    
-    SITE_MESSAGES.append("Остановка скрипта...") # Добавить вывод на сайт
-    PARSER_WORK = False
+    if len(SITE_MESSAGES) == 10 :
+        SITE_MESSAGES.popleft()
+        SITE_MESSAGES.append("Остановка скрипта...")
+    else:
+        SITE_MESSAGES.append("Остановка скрипта...")
     try:
         DRIVER.quit()
     except Exception:
@@ -131,7 +134,11 @@ def copy_cookies(s:requests.Session):
     for cookie in DRIVER.get_cookies():
             c = {cookie['name']: cookie['value']}
             s.cookies.update(c)
-    SITE_MESSAGES.append("Куки-файлы успешно скопированы!")
+    if len(SITE_MESSAGES) == 10 :
+        SITE_MESSAGES.popleft()
+        SITE_MESSAGES.append("Куки-файлы успешно скопированы!")
+    else:
+        SITE_MESSAGES.append("Куки-файлы успешно скопированы!")
 
 def scrape_setup(toParse:str, resultFilter:str)->bool:
 
@@ -144,22 +151,27 @@ def scrape_setup(toParse:str, resultFilter:str)->bool:
     TO_PARSE = toParse.splitlines()
 
 def start_parse(s:requests.Session)-> bool:
-    global PARSER_WORK
-    PARSER_WORK = True
     forum_url = str()
     for link in TO_PARSE:
         forum_url = FORUM_SETTINGS.forum_link + link
         scrape_forum(s, forum_url)
 
 def kill_parse():
-    global DRIVER, LOGIN_REQ
+    global DRIVER, LOGIN_REQ, SITE_MESSAGES
 
     LOGIN_REQ = False
     DRIVER.quit()
+    SITE_MESSAGES.clear()
 
 # Scraping all threads of the current forum
 def scrape_forum(s:requests.Session, forum_url:str):
-    SITE_MESSAGES.append(f'\n\nПроизовдится поиск по теме {forum_url}...\n')
+
+    if len(SITE_MESSAGES) == 10 :
+        SITE_MESSAGES.popleft()
+        SITE_MESSAGES.append(f'\n\nПроизовдится поиск по теме {forum_url}...\n')
+    else:
+        SITE_MESSAGES.append(f'\n\nПроизовдится поиск по теме {forum_url}...\n')
+
     html_form = str()
     if FORUM_SETTINGS.bot_protection:
         DRIVER.get(forum_url)
@@ -173,7 +185,11 @@ def scrape_forum(s:requests.Session, forum_url:str):
     check_pagination = soup.find(FORUM_SETTINGS.pagination_tag, FORUM_SETTINGS.pagination_parameter)
     if check_pagination:
         scrape_forum_page(s, soup)
-        SITE_MESSAGES.append(f'{"-"*10}Страница 1 завершена{"-"*10}\n')
+        if len(SITE_MESSAGES) == 10 :
+            SITE_MESSAGES.popleft()
+            SITE_MESSAGES.append(f'{"-"*10}Страница 1 завершена{"-"*10}\n')
+        else:
+            SITE_MESSAGES.append(f'{"-"*10}Страница 1 завершена{"-"*10}\n')
         del(soup)
         gc.collect()
         check_same_link = Tag|NavigableString|None
@@ -201,7 +217,11 @@ def scrape_forum(s:requests.Session, forum_url:str):
                     check_same_title = check_same_2
                     # ...and scraping it
                     scrape_forum_page(s, forum_page)
-                    SITE_MESSAGES.append(f'{"-"*10}Страница {i} завершена{"-"*10}\n')
+                    if len(SITE_MESSAGES) == 10 :
+                        SITE_MESSAGES.popleft()
+                        SITE_MESSAGES.append(f'{"-"*10}Страница {i} завершена{"-"*10}\n')
+                    else:
+                        SITE_MESSAGES.append(f'{"-"*10}Страница {i} завершена{"-"*10}\n')
         if FORUM_SETTINGS.pagination_case == 'C':
             page = 2
             for i in range(FORUM_SETTINGS.forum_step, 50000, FORUM_SETTINGS.forum_step):    
@@ -225,12 +245,20 @@ def scrape_forum(s:requests.Session, forum_url:str):
                     check_same_title = check_same_2
                     # ...and scraping it
                     scrape_forum_page(s, forum_page)
-                    SITE_MESSAGES.append(f'{"-"*10}Страница {page} завершена{"-"*10}\n')
+                    if len(SITE_MESSAGES) == 10 :
+                        SITE_MESSAGES.popleft()
+                        SITE_MESSAGES.append(f'{"-"*10}Страница {page} завершена{"-"*10}\n')
+                    else:
+                        SITE_MESSAGES.append(f'{"-"*10}Страница {page} завершена{"-"*10}\n')
                     page += 1
     else:
         scrape_forum_page(s, soup)
     
-    SITE_MESSAGES.append(f'\n\nПоиск по теме {forum_url} завершен!\a')    
+    if len(SITE_MESSAGES) == 10 :
+        SITE_MESSAGES.popleft()
+        SITE_MESSAGES.append(f'\n\nПоиск по теме {forum_url} завершен!')
+    else:
+        SITE_MESSAGES.append(f'\n\nПоиск по теме {forum_url} завершен!')    
 
 # Scraping BS of current forum page
 def scrape_forum_page(s:requests.Session, forum_page:BeautifulSoup):
@@ -259,7 +287,12 @@ def scrape_forum_page(s:requests.Session, forum_page:BeautifulSoup):
 
 # Scrapes all pages in a thread
 def scrape_thread(current_thread:str, s:requests.Session)->None:
-    SITE_MESSAGES.append(f'Поиск в {current_thread}')
+
+    if len(SITE_MESSAGES) == 10 :
+        SITE_MESSAGES.popleft()
+        SITE_MESSAGES.append(f'Поиск в {current_thread}')
+    else:
+        SITE_MESSAGES.append(f'Поиск в {current_thread}')
 
     html_text = str()
     if FORUM_SETTINGS.bot_protection:
@@ -322,6 +355,11 @@ def scrape_thread(current_thread:str, s:requests.Session)->None:
     else:
         scrape_page(forum_posts)
     SITE_MESSAGES.append("Успешно проверили!\n")
+    if len(SITE_MESSAGES) == 10 :
+        SITE_MESSAGES.popleft()
+        SITE_MESSAGES.append("Успешно проверили!\n")
+    else:
+        SITE_MESSAGES.append("Успешно проверили!\n")
     del(soup)
     del(check_pagination)
     del(forum_posts)
@@ -343,10 +381,14 @@ def find_names(forum_texts:list)->None:
                 # While writing regex pattern in python !USE! '\\' for one '\'
                 found_data =  re.findall(FORUM_SETTINGS.search_string, tag.text.split(word)[1])
                 for data in found_data:
-                    total_found += 1
                     if not (data in BANNED_EXCEPTIONS) and not Nickname.objects.filter(handler=data).exists():
+                        total_found += 1
                         Nickname(handler=data, forumOrigin=FORUM_SETTINGS.forumObject).save()
-    SITE_MESSAGES.append(f'Найдено {total_found} совпадений.')
+    if len(SITE_MESSAGES) == 10 :
+        SITE_MESSAGES.popleft()
+        SITE_MESSAGES.append(f'Найдено {total_found} совпадений.')
+    else:
+        SITE_MESSAGES.append(f'Найдено {total_found} совпадений.')
 
 
 # PARSER SETTINGS FOR PARSE
@@ -357,7 +399,6 @@ FORUM_SETTINGS = None
 DRIVER = None
 
 LOGIN_REQ = False
-PARSER_WORK = False
 
 def loginReqCheck(request):
     global LOGIN_REQ
@@ -374,4 +415,4 @@ KEY_WORDS = []
 
 TO_PARSE=[]
 
-SITE_MESSAGES = []
+SITE_MESSAGES = deque(maxlen=10)
