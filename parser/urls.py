@@ -17,7 +17,10 @@ htmx_urlpatterns = [
     path('start_parse/', startParse, name="startParse"),
     path('stop_parse/', stopParse, name="stopParse"),
     path('login_check/', loginReqCheck, name='loginCheck'),
-    path('get_progress_text/', getProgressText, name="getProgressText")
+    path('get_progress_text/', getProgressText, name="getProgressText"),
+    path('delete_handler/<int:id>/', delete_handler, name="delete"),
+    path('add_to_keys/<int:id>/', add_to_keys, name="add_key"),
+    path('add_to_banned/<int:id>/', add_to_banned, name="add_banned"),
 ]
 
 urlpatterns += htmx_urlpatterns

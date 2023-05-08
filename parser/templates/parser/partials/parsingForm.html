@@ -1,18 +1,18 @@
 {% load static %}
-<form action="{% url 'parsing' %}" method="post" class="col-6 border-right" id="parseLinks">
-    <select name="linkSelect" id="linkSelect" class="row form-select mx-4 my-2" required>
+<form action="" method="post" class="col-6 border-end" id="parseLinks">
+    <select name="linkSelect" id="linkSelect" class="row form-select mx-auto my-1 bg-secondary text-light" required>
         <option class="text-muted disabled">Оберіть форум...</option>
         {% for forum in forums %}
         <option value="{{forum}}">{{forum}}</option>
         {% endfor %}
     </select>
-    <select name="filterSelect" id="filterSelect" class="row form-select mx-4 my-2" required>
+    <select name="filterSelect" id="filterSelect" class="row form-select mx-auto my-1 bg-secondary text-light" required>
         <option class="text-muted disabled">Оберіть фільтр пошуку...</option>
         {% for filter in filters %}
         <option value="{{filter}}">{{filter}}</option>
         {% endfor %}
     </select>
-    <textarea name="linksToParse" id="linksToParse" cols="76" rows="10" class="row mx-4 my-2" required></textarea>
+    <textarea name="linksToParse" id="linksToParse" cols="81" rows="10" class="row mx-auto my-2 bg-secondary text-light" required></textarea>
     <div class="col-12 text-center px-4">
         <input type="button" class="btn btn-success" value="Зберегти" hx-post="/start_parse/" hx-target="#parseLinks" hx-swap="outerHTML">
     </div>
