@@ -8,6 +8,9 @@ from .models import Forum, Nickname, BannedFilter
 import json
 from django.db.models import Q
 
+from pandas import DataFrame, ExcelWriter
+import csv
+
 def index(request):
     return render(request, 'parser/index.html')
 
@@ -129,6 +132,39 @@ def save_search_results(request):
     for user in user_results:
             writer.writerow([user.id, user.handler, user.user_id, user.nicknames, user.forumOrigin,])
     return response
+
+def save_as_excel(request):
+    forums=(set(Forum.objects.values_list('link')))
+    forumlist={}
+    response = HttpResponse(content_type='text/xslx')
+    response['Content-Disposition'] = 'attachment; filename=result_user.xlsx'
+    writer = ExcelWriter(response)
+    users=Nickname.objects.all()
+    for user in users:
+        for forum in forums:
+            if str(user.forumOrigin) in str(forum):
+                name = user.forumOrigin.link.replace('/', '')
+                print(name)
+                name = name.replace('http:', '')
+                name = name.replace('https:', '')
+                print(name)
+                try:
+                    forumlist[f'{name}'].append([user.handler, user.nicknames])
+                except:
+                    newadd={f'{name}':[[user.handler, user.nicknames]]}
+                    forumlist.update(newadd)
+    
+    for list in forumlist:
+        DataFrame(forumlist[list]).to_excel(writer,sheet_name=f'{list}',index=False)
+    writer.save()                   
+    return response
+#save_search_excel
+                
+                
+            
+        
+    
+    
     
 
 # ============================================[ HTMX functions ]============================================ #

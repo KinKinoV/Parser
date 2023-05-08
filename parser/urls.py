@@ -11,6 +11,7 @@ urlpatterns = [
     path('parsing/', parsing, name='parsing'),
     path('search_user/', search_user, name='search_user'),
     path('save_search_csv/', save_search_results, name='save_search_csv'),
+    path('save_search_excel/', save_as_excel, name='save_search_excel'),
 ]
 
 htmx_urlpatterns = [

@@ -26,6 +26,22 @@
             <a class="nav-link" href="{%url 'save_search_csv' %}">Зберегти дані як csv</a>
           </li>
           {%endif%}
+          <li class="nav-item dropdown">
+            <div class="dropdown">
+              <a class="nav-link dropdown-toggle" href="#" role="button" id="navbarScrollingDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                User Activity
+              </a>
+              <ul class="dropdown-menu" aria-labelledby="navbarScrollingDropdown">
+               {%if user.is_superuser%}
+                <li><a class="dropdown-item" href="{%url 'register_user'%}">Register</a></li>
+               {%endif%}
+               {%if user.is_authenticated%}
+                <li><a class="dropdown-item" href="{%url 'logout'%}">Logout</a></li>
+               {%else%}
+                <li><a class="dropdown-item" href="{%url 'login'%}">Login</a></li>
+               {%endif%}
+              </ul>
+            </div>
         </ul>
       </div>
     </div>
