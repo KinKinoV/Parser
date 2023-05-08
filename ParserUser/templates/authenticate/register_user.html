@@ -9,38 +9,33 @@
   </div>
 {%endif%}
 <br/>
-    <div class = "shadow p-4 mb-5 bg-secondary rounded">
-    <h1 class = "text-center">Register</h1>
-<br/>
-<br/>
-
-    <form method="POST" >
-            {%csrf_token%}
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="mb-3">
+    <div class = "container-sm shadow bg-secondary rounded pt-4">
+        <h1 class = "text-center">Register</h1>
+        <br/>
+        <br/>
+        <form method="POST" class="container-sm">
+                {%csrf_token%}
+                <div class="row justify-content-around">
+                    <div class="col-6 mb-3">
                         <label for="username" class="form-label">Username</label>
                         {{form.username}}
                     </div>
-                    <div class="mb-3">
+                </div>
+                <div class="row justify-content-around">
+                    <div class="col-6 mb-3">
                         <label for="password" class="form-label">Password</label>
                         {{form.password1}}
                     </div>
-                    <div class="mb-3">
+                </div>
+                <div class="row justify-content-around">
+                    <div class="col-6 mb-3">
                         <label for="confirm password" class="form-label">Confirm password</label>
                         {{form.password2}}
                     </div>
                 </div>
-            </div>
-            <input type = 'submit' value = 'Submit' class = 'btn btn-success'>
-        </form> 
+                <div class="row justify-content-around">
+                    <input type = 'submit' value = 'Submit' class = 'btn btn-success col-4 mb-4'>
+                </div>
+            </form> 
     </div>
-
-
-    <center>
-        <br/>
-        <br/>
-        <br/>
-        Copyright (c)
-    </center>
 {%endblock%}

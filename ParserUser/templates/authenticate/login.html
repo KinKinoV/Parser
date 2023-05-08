@@ -1,31 +1,32 @@
 {% extends 'parser/base_generic.html' %}
 
 {%block content%}
+<div class = "container-sm shadow bg-secondary rounded pt-4">
+  <br/>
+      <h1 class = "text-center">LoGiN</h1>
+  <br/>
+  <br/>
 
-<br/>
-    <h1>Login</h1>
-<br/>
-<br/>
-
-<form action="" method=POST enctype='multipart/form-data'>
-            {%csrf_token%}
-            <div class="mb-3">
-                <label for="exampleInputEmail1" class="form-label">Username</label>
-                <input type="text" class="form-control" name="username" aria-describedby="emailHelp">
-              <div class="mb-3">
-                <label for="exampleInputPassword1" class="form-label">Password</label>
-                <input type="password" class="form-control" name="password">
-              </div>
-
-            <input type = 'submit' value = 'Submit' class = 'btn btn-success'>
-        </form> 
-
-
-
-    <center>
-        <br/>
-        <br/>
-        <br/>
-        Copyright (c) {{current_year}}
-    </center>
+  <form action="" method="POST" enctype='multipart/form-data' class="container-sm">
+    {%csrf_token%}
+    <div class="row justify-content-around">
+      <div class="col-6 mb-3">
+        <label for="exampleInputEmail1" class="form-label">Username</label>
+        <input type="text" class="form-control" name="username" aria-describedby="emailHelp">
+      </div>
+    </div>
+    <div class="row justify-content-around">
+      <div class="col-6 mb-3">
+        <label for="exampleInputPassword1" class="form-label">Password</label>
+        <input type="password" class="form-control" name="password">
+      </div>
+    </div>
+    <div class="row justify-content-around">
+      <input type = 'submit' value = 'Submit' class = 'btn btn-success col-6 mb-4'>
+    </div>
+    
+      
+    
+  </form>
+</div>
 {%endblock%}
