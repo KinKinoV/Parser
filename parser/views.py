@@ -3,7 +3,7 @@ from django.core.paginator import Paginator
 from django.http import HttpResponseRedirect, HttpResponse
 from django.db.models import Q
 from django.urls import reverse
-from .parser import parse, kill_parse, SITE_MESSAGES
+from .parser import parse, kill_driver, SITE_MESSAGES
 from .models import Forum, Nickname, BannedFilter, KeyWordFilter
 import json
 from threading import Thread
@@ -23,8 +23,9 @@ def tagDataGet(request):
         pagination_parameter = {}
         thread_post_parameter = {}
         thread_link_parameter = {}
-        parameters_dict = [message_parameter, pagination_parameter, thread_post_parameter, thread_link_parameter]
-        parameters_names = ['message_parameter', 'pagination_parameter', 'thread_post_parameter', 'thread_link_parameter']
+        main_page_theme_link_parameter = {}
+        parameters_dict = [message_parameter, pagination_parameter, thread_post_parameter, thread_link_parameter, main_page_theme_link_parameter]
+        parameters_names = ['message_parameter', 'pagination_parameter', 'thread_post_parameter', 'thread_link_parameter', 'main_page_theme_link_parameter']
         values = zip(parameters_dict, parameters_names)
 
         for parameter_dict, parameter_name in values:
@@ -51,6 +52,8 @@ def tagDataGet(request):
             'thread_post_parameter' : thread_post_parameter,
             'thread_link_tag' : request.POST.get('thread_link_tag'),
             'thread_link_parameter' : thread_link_parameter,
+            'main_page_theme_link_tag': request.POST.get('main_page_theme_link_tag'),
+            'main_page_theme_link_parameter': main_page_theme_link_parameter,
             'pagination_case' : request.POST.get('paginationCase'),
             'pagination_template' : request.POST.get('paginationTemplate'),
             'page_load_delay' : request.POST.get('pageLoadDelay')
@@ -75,9 +78,6 @@ def tagDataGet(request):
     
     return render(request, 'parser/tag_data.html')
 
-def otherData(request):
-    return render(request, 'parser/other_data.html')
-
 def about(request):
     return render(request, 'parser/about.html')
 
@@ -85,11 +85,11 @@ def resultPage(request):
     p = Paginator(Nickname.objects.all(), 100)
     page = request.GET.get('page')
     users = p.get_page(page)
-    nums = ""*users.paginator.num_pages
+    users.adjusted_elided_pages = p.get_elided_page_range(page)
     forums=(set(Nickname.objects.values_list('forumOrigin',flat=True)))
     context = {
         'users': users,
-        'nums': nums,
+        'nums': range(users.paginator.num_pages),
         'forums': forums,
     }
     return render(request, 'parser/results.html', context)
@@ -103,7 +103,6 @@ def parsing(request):
     if request.method == 'PATCH':
         return render(request, 'parser/partials/parsingForm.html', context)
     
-    
     return render(request, 'parser/parse_page.html', context)
 
 # ============================================[ HTMX functions ]============================================ #
@@ -115,7 +114,8 @@ def tagDataNewField(request):
             'message': 1,
             'pagination': 2,
             'thread_post': 3,
-            'thread_link': 4
+            'thread_link': 4,
+            'main_page_theme_link': 5,
             }
         context = {
             'parameterName' : parameter, 
@@ -128,17 +128,16 @@ def startParse(request):
     context = {}
     if request.method == 'POST':
         link = request.POST.get('linkSelect')
-        toParse = request.POST.get('linksToParse')
         resultFilter = request.POST.get('filterSelect')
         # Обязательно name в будущем сделать с учётом присутствия нескольких пользователей
-        Thread(target=parse, args=[link, toParse, resultFilter], name='ParserThread').start()
+        Thread(target=parse, args=[link, resultFilter], name='ParserThread').start()
         if '"login_requirment": "True"' in Forum.objects.get(link=link).parseConfigs:
             context['login_check'] = True
         return render(request, 'parser/partials/stopButton.html', context)
 
 def stopParse(request):
     if request.method == "PATCH":
-        kill_parse()
+        kill_driver()
         context = {
             'forums': Forum.objects.all().order_by('link'),
             'filters' : BannedFilter.objects.all().order_by('purpose')
@@ -150,7 +149,14 @@ def getProgressText(request):
     if request.method == "GET":
         if not len(SITE_MESSAGES) == 0:
             for msg in SITE_MESSAGES:
-                text_to_pass += msg + '<br>'
+                if msg == "Остановка скрипта...":
+                    context = {
+                        'forums': Forum.objects.all().order_by('link'),
+                        'filters' : BannedFilter.objects.all().order_by('purpose')
+                    }
+                    return render(request, 'parser/partials/parsingForm.html', context)
+                else:
+                    text_to_pass += msg + '<br>'
             return HttpResponse(f"{text_to_pass}")
         else:
             return HttpResponse("")
@@ -174,9 +180,7 @@ def search_user(request):
 def delete_handler(request, id):
     if request.method == "GET":
         Nickname.objects.filter(pk=id).delete()
-        response = HttpResponse("Okay")
-        response["HX-Redirect"] = reverse("results") + f"?page={request.GET.get('page')}"
-        return response
+        return HttpResponse()
 
 def add_to_keys(request, id):
     if request.method == "GET":
@@ -184,9 +188,7 @@ def add_to_keys(request, id):
         key_word_db.filter += '\n' + Nickname.objects.get(pk=id).handler
         key_word_db.save()
         Nickname.objects.get(pk=id).delete()
-        response = HttpResponse("Okay")
-        response["HX-Redirect"] = reverse("results") + f"?page={request.GET.get('page')}"
-        return response
+        return HttpResponse()
 
 def add_to_banned(request, id):
     if request.method == "GET":
@@ -194,6 +196,4 @@ def add_to_banned(request, id):
         banned_word_db.filter += '\n' + Nickname.objects.get(pk=id).handler
         banned_word_db.save()
         Nickname.objects.filter(pk=id).delete()
-        response = HttpResponse("Okay")
-        response["HX-Redirect"] = reverse("results") + f"?page={request.GET.get('page')}"
-        return response
+        return HttpResponse()
