@@ -1,25 +1,34 @@
-<div class="col-6 border-end" id="stopForm">
-    {% if login_check %}
-        <div class="form-check col text-center">
-            <input type="checkbox" 
-            name="loginCheck" 
-            id="loginCheck" 
-            class="form-check-input mx-auto" 
+<div class="row" id="stopForm">
+    <div class="col-6 border-end">
+        {% if login_check %}
+            <div class="form-check col text-center">
+                <input type="checkbox" 
+                name="loginCheck" 
+                id="loginCheck" 
+                class="form-check-input mx-auto" 
+                hx-trigger="click" 
+                hx-post="{% url 'loginCheck' %}" 
+                hx-target="#stopForm"
+                hx-swap="outerHTML" 
+                value="True">
+                <label for="loginCheck" class="form-check-label">Ви виконали <a href="https://localhost:7900/?autoconnect=1&resize=scale&password=secret">вхід</a> в аккаунт на форумі?</label>
+            </div>
+        {% endif %}
+        <div class="col text-center my-auto" id="stopButton">
+            <input type="button"  
+            class="btn btn-danger btn-lg" 
+            value="Зупинити" 
+            hx-patch="{% url 'stopParse' %}" 
             hx-trigger="click" 
-            hx-post="/login_check/" 
-            hx-target="#stopForm"
-            hx-swap="outerHTML" 
-            value="True">
-            <label for="loginCheck" class="form-check-label">Ви виконали вхід в аккаунт на форумі?</label>
+            hx-target="#stopForm" 
+            hx-swap="outerHTML">
         </div>
-    {% endif %}
-    <div class="col text-center my-auto" id="stopButton">
-        <input type="button"  
-        class="btn btn-danger btn-lg" 
-        value="Зупинити" 
-        hx-patch="/stop_parse/" 
-        hx-trigger="click" 
-        hx-target="#stopForm" 
-        hx-swap="outerHTML">
+    </div>
+    <div class="col-5 bg-success mx-auto"
+                style="--bs-bg-opacity: .5"
+                hx-get="{% url 'getProgressText' %}"
+                hx-trigger="every 1.5s"
+                hx-swap="innerHTML">
+                
     </div>
 </div>
