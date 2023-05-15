@@ -1,0 +1,41 @@
+{% extends 'parser/base_generic.html' %}
+
+{%block content%}
+
+{%if form.errors%}
+<div class="alert alert-warning alert-dismissible fade show" role="alert">
+    There was an error with your form
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  </div>
+{%endif%}
+<br/>
+    <div class = "container-sm shadow bg-secondary rounded pt-4">
+        <h1 class = "text-center">Register</h1>
+        <br/>
+        <br/>
+        <form method="POST" class="container-sm">
+                {%csrf_token%}
+                <div class="row justify-content-around">
+                    <div class="col-6 mb-3">
+                        <label for="username" class="form-label">Username</label>
+                        {{form.username}}
+                    </div>
+                </div>
+                <div class="row justify-content-around">
+                    <div class="col-6 mb-3">
+                        <label for="password" class="form-label">Password</label>
+                        {{form.password1}}
+                    </div>
+                </div>
+                <div class="row justify-content-around">
+                    <div class="col-6 mb-3">
+                        <label for="confirm password" class="form-label">Confirm password</label>
+                        {{form.password2}}
+                    </div>
+                </div>
+                <div class="row justify-content-around">
+                    <input type = 'submit' value = 'Submit' class = 'btn btn-success col-4 mb-4'>
+                </div>
+            </form> 
+    </div>
+{%endblock%}

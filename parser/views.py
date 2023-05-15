@@ -9,6 +9,9 @@ import json
 from threading import Thread
 
 
+from pandas import DataFrame, ExcelWriter
+import csv
+
 def index(request):
     return render(request, 'parser/index.html')
 
@@ -104,6 +107,65 @@ def parsing(request):
         return render(request, 'parser/partials/parsingForm.html', context)
     
     return render(request, 'parser/parse_page.html', context)
+
+def save_result(request):
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename=result_user.csv'
+    writer = csv.writer(response)
+    writer.writerow(['Id','Handler','Telegram Id','Nicknames','Forum of origin',])
+    users=Nickname.objects.all()
+    for user in users:
+        writer.writerow([user.id, user.handler, user.user_id, user.nicknames, user.forumOrigin,])
+    return response
+
+def save_search_results(request):
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename=result_user.csv'
+    writer = csv.writer(response)
+    writer.writerow(['Id','Handler','Telegram Id','Nicknames','Forum of origin',])
+    with open('bufferSearch.txt', 'r') as f:
+        txt=f.read()
+        components=txt.split(',')
+        search_text = components[0]
+        forum_of_origin = components[1]
+    user_results =  Nickname.objects.filter(Q(forumOrigin__link__icontains=forum_of_origin)&Q(handler__icontains=search_text)).order_by('id')
+    for user in user_results:
+            writer.writerow([user.id, user.handler, user.user_id, user.nicknames, user.forumOrigin,])
+    return response
+
+def save_as_excel(request):
+    forums=(set(Forum.objects.values_list('link')))
+    forumlist={}
+    response = HttpResponse(content_type='text/xslx')
+    response['Content-Disposition'] = 'attachment; filename=result_user.xlsx'
+    writer = ExcelWriter(response)
+    users=Nickname.objects.all()
+    for user in users:
+        for forum in forums:
+            if str(user.forumOrigin) in str(forum):
+                name = user.forumOrigin.link.replace('/', '')
+                print(name)
+                name = name.replace('http:', '')
+                name = name.replace('https:', '')
+                print(name)
+                try:
+                    forumlist[f'{name}'].append([user.handler, user.nicknames])
+                except:
+                    newadd={f'{name}':[[user.handler, user.nicknames]]}
+                    forumlist.update(newadd)
+    
+    for list in forumlist:
+        DataFrame(forumlist[list]).to_excel(writer,sheet_name=f'{list}',index=False)
+    writer.save()                   
+    return response
+#save_search_excel
+                
+                
+            
+        
+    
+    
+    
 
 # ============================================[ HTMX functions ]============================================ #
 def tagDataNewField(request):

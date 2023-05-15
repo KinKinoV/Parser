@@ -2,14 +2,14 @@
 {% block title %} <title>About</title> {% endblock title %}
 
 {% block content %}
-<h1 class="display-1 text-center mb-5">About page</h1>
-<div class="container bg-light rounded-3" style="--bs-bg-opacity: .05">
-    <br/>
-    <br/>
-    <br/>
-    <div class="text-center">Text</div>
-    <br/>
-    <br/>
-    <br/>
-</div>
+    <h1 class="display-1 text-center">About page</h1>
+    <div class="container bg-light rounded-3" style="--bs-bg-opacity: .05">
+        <a href ="{%url 'register_user'%}">Register</a>
+        <h1>Hello {{user.username}}</h1>
+        {%if user.is_authenticated%}
+        <a href ="{%url 'logout'%}">Logout</a>
+        {%else%}
+        <a href ="{%url 'login'%}">Login</a>
+        {%endif%}
+    </div>
 {% endblock content %}
