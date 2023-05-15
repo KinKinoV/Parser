@@ -12,8 +12,8 @@
         <option value="{{filter}}">{{filter}}</option>
         {% endfor %}
     </select>
-    <textarea name="linksToParse" id="linksToParse" cols="81" rows="10" class="row mx-auto my-2 bg-secondary text-light" required></textarea>
+    {% comment %} <textarea name="linksToParse" id="linksToParse" cols="81" rows="10" class="row mx-auto my-2 bg-secondary text-light" required></textarea> {% endcomment %}
     <div class="col-12 text-center px-4">
-        <input type="button" class="btn btn-success" value="Зберегти" hx-post="/start_parse/" hx-target="#parseLinks" hx-swap="outerHTML">
+        <input type="button" class="btn btn-success" value="Зберегти" hx-post="{% url 'startParse' %}" hx-target="#parseLinks" hx-swap="outerHTML">
     </div>
 </form>

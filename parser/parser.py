@@ -2,6 +2,7 @@ from bs4 import BeautifulSoup, NavigableString, ResultSet, Tag
 from time import sleep
 from selenium import webdriver
 from collections import deque
+from os import getcwd
 from django import setup
 setup()
 from django.shortcuts import render
@@ -9,6 +10,7 @@ from django.http import HttpResponse
 from .models import Forum, Nickname, BannedFilter, KeyWordFilter
 import gc, re, requests, json
 
+# PARSER SETTINGS FOR PARSE
 class ParseSettings:
     message_tag = str
     message_parameter = {}
@@ -28,6 +30,8 @@ class ParseSettings:
     forum_link = str
     login_requirment = False
     forumObject = Forum
+    main_page_theme_link_tag = str
+    main_page_theme_link_parameter = {}
 
 
     def __init__(self, link: str):
@@ -39,11 +43,20 @@ class ParseSettings:
         try:
             data = json.loads(parseConfs)
         except json.decoder.JSONDecodeError:
-            print(f"\n{'='*30}\nError in file {__name__}.py!!!\n{'='*30}\nSomething wrong with the saved parseConfigs for thr {link}.\n\n")
+            print(f"\n{'='*30}\nError in file {__name__}.py!!!\n{'='*30}\nSomething wrong with the saved parseConfigs for the {link}.\n\n")
             exit()
         regex_pattern = '/~/'
         
         self.forumObject = Forum.objects.get(link=link)
+
+        self.main_page_theme_link_tag = data['main_page_theme_link_tag']
+        if data['main_page_theme_link_parameter']:
+            for key, value in data['main_page_theme_link_parameter'].items():
+                if regex_pattern in value:
+                    self.main_page_theme_link_parameter[key] = re.compile(value.strip(regex_pattern))
+                else:
+                    self.main_page_theme_link_parameter[key] = value
+
         self.message_tag = data['message_tag']
         for key, value in data['message_parameter'].items():
             if regex_pattern in value:
@@ -92,20 +105,49 @@ class ParseSettings:
         if data['login_requirment'] == 'True':
             self.login_requirment = True
 
+# Tags to use in scraping
+FORUM_SETTINGS = ParseSettings
+# Selenium driver to use
+DRIVER = webdriver.Remote
+
+LOGIN_REQ = False
+
+def loginReqCheck(request):
+    global LOGIN_REQ
+    if request.method == 'POST' and request.POST.get('loginCheck') == "True":
+        LOGIN_REQ = True
+        return render(request, 'parser/partials/stopButton.html')
+    return HttpResponse('OK')
+
+# Fetched from the DB
+# Words to NOT to write to result file
+BANNED_EXCEPTIONS = []
+# If any in thread's message, start searching for needed data
+KEY_WORDS = []
+
+TO_PARSE=[]
+
+SITE_MESSAGES = deque(maxlen=10)
+
+
 def parse(*args)->None:
     global DRIVER, FORUM_SETTINGS, LOGIN_REQ, SITE_MESSAGES
+
     FORUM_SETTINGS = ParseSettings(args[0])
-    scrape_setup(args[1], args[2])
+    scrape_setup(args[1])
 
     options_ = webdriver.FirefoxOptions()
     options_.page_load_strategy = 'eager'
-    DRIVER = webdriver.Remote("http://localhost:4444", options=options_)
-
-    # Получаю куки-файлы из селениума и передаю их скрипту для
-    # удачных реквестов страниц 
+    profile = webdriver.FirefoxProfile()
+    profile.set_preference("browser.cache.disk.enable", False)
+    profile.set_preference("browser.cache.memory.enable", False)
+    profile.set_preference("browser.cache.offline.enable", False)
+    profile.set_preference("network.http.use-cache", False)
+    DRIVER = webdriver.Remote("http://localhost:4444", options=options_, browser_profile=profile)
+    # Получаю куки-файлы из селениума и передаю их requests.Session для
+    # удачных реквестов страниц если не нужен браузер
     DRIVER.get(f"{FORUM_SETTINGS.forum_link}")
     s = requests.Session()
-
     if FORUM_SETTINGS.login_requirment:
         while True:
             if LOGIN_REQ:
@@ -118,17 +160,31 @@ def parse(*args)->None:
     if not FORUM_SETTINGS.bot_protection:
         DRIVER.quit()
     
-    start_parse(s)
+    try:
+        start_parse(s)
+    except:
+        if len(SITE_MESSAGES) == 10 :
+            SITE_MESSAGES.popleft()
+            SITE_MESSAGES.append("Остановка скрипта...")
+        else:
+            SITE_MESSAGES.append("Остановка скрипта...")
+
     if len(SITE_MESSAGES) == 10 :
         SITE_MESSAGES.popleft()
         SITE_MESSAGES.append("Остановка скрипта...")
     else:
         SITE_MESSAGES.append("Остановка скрипта...")
-    try:
-        DRIVER.quit()
-    except Exception:
-        pass
-    SITE_MESSAGES.clear()
+
+    sleep(2)
+    kill_driver()
+
+def scrape_setup(resultFilter:str)->bool:
+
+    global BANNED_EXCEPTIONS, KEY_WORDS
+
+    BANNED_EXCEPTIONS = BannedFilter.objects.get(purpose=resultFilter).filter.splitlines()
+    
+    KEY_WORDS = KeyWordFilter.objects.get(purpose=resultFilter).filter.splitlines()
 
 def copy_cookies(s:requests.Session):
     for cookie in DRIVER.get_cookies():
@@ -140,28 +196,38 @@ def copy_cookies(s:requests.Session):
     else:
         SITE_MESSAGES.append("Куки-файлы успешно скопированы!")
 
-def scrape_setup(toParse:str, resultFilter:str)->bool:
-
-    global BANNED_EXCEPTIONS, KEY_WORDS, TO_PARSE
-
-    BANNED_EXCEPTIONS = BannedFilter.objects.get(purpose=resultFilter).filter.splitlines()
-    
-    KEY_WORDS = KeyWordFilter.objects.get(purpose=resultFilter).filter.splitlines()
-
-    TO_PARSE = toParse.splitlines()
-
 def start_parse(s:requests.Session)-> bool:
-    forum_url = str()
+    global TO_PARSE
+
+    if len(SITE_MESSAGES) == 10 :
+        SITE_MESSAGES.popleft()
+        SITE_MESSAGES.append(f'\n\nПроизовдится поиск по форуму {FORUM_SETTINGS.forum_link}...\n')
+    else:
+        SITE_MESSAGES.append(f'\n\nПроизовдится поиск по теме {FORUM_SETTINGS.forum_link}...\n')
+
+    forum_html = str()
+    if FORUM_SETTINGS.bot_protection:
+        DRIVER.get(FORUM_SETTINGS.forum_link)
+        sleep(FORUM_SETTINGS.page_load_delay)
+        forum_html = DRIVER.page_source
+    else:
+        forum_html = s.get(FORUM_SETTINGS.forum_link).text
+        sleep(FORUM_SETTINGS.page_load_delay)
+    
+    main_page_soup = BeautifulSoup(forum_html, "html.parser")
+    theme_links = main_page_soup.find_all(FORUM_SETTINGS.main_page_theme_link_tag, FORUM_SETTINGS.main_page_theme_link_parameter)
+    for tag in theme_links:
+        a_tags = tag.findChildren('a')
+        if ('https://' in a_tags[0]["href"]) or ('http://' in a_tags[0]["href"]):
+            link = a_tags[0]["href"].replace(f'https://{FORUM_SETTINGS.forum_link}', '')
+            link = a_tags[0]["href"].replace(f'http://{FORUM_SETTINGS.forum_link}', '')
+            TO_PARSE.append(link)
+        else:
+            TO_PARSE.append(a_tags[0]["href"])
+
     for link in TO_PARSE:
-        forum_url = FORUM_SETTINGS.forum_link + link
-        scrape_forum(s, forum_url)
-
-def kill_parse():
-    global DRIVER, LOGIN_REQ, SITE_MESSAGES
-
-    LOGIN_REQ = False
-    DRIVER.quit()
-    SITE_MESSAGES.clear()
+        scrape_forum(s, FORUM_SETTINGS.forum_link + link)
+        TO_PARSE.remove(link)
 
 # Scraping all threads of the current forum
 def scrape_forum(s:requests.Session, forum_url:str):
@@ -224,7 +290,7 @@ def scrape_forum(s:requests.Session, forum_url:str):
                         SITE_MESSAGES.append(f'{"-"*10}Страница {i} завершена{"-"*10}\n')
         if FORUM_SETTINGS.pagination_case == 'C':
             page = 2
-            for i in range(FORUM_SETTINGS.forum_step, 50000, FORUM_SETTINGS.forum_step):    
+            for i in range(FORUM_SETTINGS.forum_step, 500000, FORUM_SETTINGS.forum_step):    
                 # Creating soup of the current page
                 forum_page = None
                 if FORUM_SETTINGS.bot_protection:
@@ -315,7 +381,7 @@ def scrape_thread(current_thread:str, s:requests.Session)->None:
         if FORUM_SETTINGS.pagination_case == 'I':
             for i in range(2,5000):
                 html_text = str()
-                if FORUM_SETTINGS.bot_protection:
+                if FORUM_SETTINGS.bot_protection:   
                     DRIVER.get(current_thread+FORUM_SETTINGS.pagination_template.format(i))
                     sleep(FORUM_SETTINGS.page_load_delay)
                     html_text = DRIVER.page_source
@@ -391,28 +457,13 @@ def find_names(forum_texts:list)->None:
         SITE_MESSAGES.append(f'Найдено {total_found} совпадений.')
 
 
-# PARSER SETTINGS FOR PARSE
+def kill_driver():
+    global DRIVER, LOGIN_REQ, SITE_MESSAGES, TO_PARSE
 
-# Tags to use in scraping
-FORUM_SETTINGS = None
-# Selenium driver to use
-DRIVER = None
-
-LOGIN_REQ = False
-
-def loginReqCheck(request):
-    global LOGIN_REQ
-    if request.method == 'POST' and request.POST.get('loginCheck') == "True":
-        LOGIN_REQ = True
-        return render(request, 'parser/partials/stopButton.html')
-    return HttpResponse('OK')
-
-# Fetched from the DB
-# Words to NOT to write to result file
-BANNED_EXCEPTIONS = []
-# If any in thread's message, start searching for needed data
-KEY_WORDS = []
-
-TO_PARSE=[]
-
-SITE_MESSAGES = deque(maxlen=10)
+    LOGIN_REQ = False
+    try:
+        DRIVER.quit()
+    except:
+        pass
+    SITE_MESSAGES.clear()
+    TO_PARSE.clear()
