@@ -82,8 +82,23 @@
             </div>
             <div class="row justify-content-center border-top py-4">
                 <div class="col col-4 border-end">
+                    <label for="main_page_theme_link_tag" class="h5 text-center mb-3">
+                        1. Тег посилання на підфорум:
+                    </label>
+                    <input type="text" id="main_page_theme_link_tag" name="main_page_theme_link_tag" class="form-control" required>
+                    <small class="form-text text-muted">
+                        Ведіть назву тега, в якому є тег з посиланням на підфорум. Праворуч ведіть атрибути.
+                    </small>
+                    <img class="img-fluid" src="{% static 'parser/img/themeLinkTagExample.png' %}" alt="themeLinkTagExample.png">
+                </div>
+                <div class="col col-8">
+                    {% include 'parser/partials/formField.html' with parameterName="main_page_theme_link" value="1" idNum="5" %}
+                </div>
+            </div>
+            <div class="row justify-content-center border-top py-4">
+                <div class="col col-4 border-end">
                     <label for="pagination_tag" class="h5 text-center mb-3">
-                        1. Тег пагінації:
+                        2. Тег пагінації:
                     </label>
                     <input type="text" id="pagination_tag" name="pagination_tag" class="form-control" required>
                     <small class="form-text text-muted">
@@ -98,7 +113,7 @@
             <div class="row justify-content-center border-top py-4">
                 <div class="col col-4 border-end">
                     <label for="thread_link_tag" class="h5 text-center mb-3">
-                        2. Тег посилання на підтему:
+                        3. Тег посилання на підтему:
                     </label>
                     <input type="text" id="thread_link_tag" name="thread_link_tag" class="form-control" required>
                     <small class="form-text text-muted">
@@ -113,7 +128,7 @@
             <div class="row justify-content-center border-top py-4">
                 <div class="col col-lg-4 border-end">
                     <label for="thread_post_tag" class="h5 text-center mb-3">
-                        3. Тег тіла поста форуму:
+                        4. Тег тіла поста форуму:
                     </label>
                     <input type="text" id="thread_post_tag" name="thread_post_tag" class="form-control" required>
                     <small class="form-text text-muted">
@@ -128,7 +143,7 @@
             <div class="row justify-content-center border-top py-4">
                 <div class="col col-4 border-end">
                     <label for="message_tag" class="h5 text-center mb-3">
-                        4. Тег повідомлення(поста):
+                        5. Тег повідомлення(поста):
                     </label>
                     <input type="text" id="message_tag" name="message_tag" class="form-control" placeholder="div, li, etc..." required>
                     <small class="form-text text-muted">
