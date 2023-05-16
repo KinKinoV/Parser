@@ -86,13 +86,15 @@ def about(request):
 
 def resultPage(request):
     p = Paginator(Nickname.objects.all(), 100)
-    page = request.GET.get('page')
+    try:
+        page = request.GET["page"]
+    except:
+        page = 1
     users = p.get_page(page)
-    users.adjusted_elided_pages = p.get_elided_page_range(page)
+    users.adjusted_elided_pages = p.get_elided_page_range(number=page)
     forums=(set(Nickname.objects.values_list('forumOrigin',flat=True)))
     context = {
         'users': users,
-        'nums': range(users.paginator.num_pages),
         'forums': forums,
     }
     return render(request, 'parser/results.html', context)
@@ -158,14 +160,6 @@ def save_as_excel(request):
         DataFrame(forumlist[list]).to_excel(writer,sheet_name=f'{list}',index=False)
     writer.save()                   
     return response
-#save_search_excel
-                
-                
-            
-        
-    
-    
-    
 
 # ============================================[ HTMX functions ]============================================ #
 def tagDataNewField(request):
