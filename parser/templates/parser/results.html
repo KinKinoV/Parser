@@ -2,18 +2,34 @@
 
 {% block title %} <title>Results</title> {% endblock title %}
 {% load static %}
+
 {% block additionalStatic %}
-<style>
-    .button-img {
-        opacity: 0
-    }
-    td:hover .button-img { opacity: 1;}
-</style>
+    {% if users %}
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+    <style>
+        .button-img {
+            opacity: 0
+        }
+        td:hover .button-img { opacity: 1;}
+    </style>
+    <script>
+        $(document).on("click", "#addBanned", function(){
+            location.reload();      
+        });
+        $(document).on("click", "#addFilter", function(){
+            location.reload();      
+        });
+        $(document).on("click", "#deleteUser", function(){
+            location.reload();      
+        });
+    </script>
+    {% endif %}
 {% endblock additionalStatic %}
 
 {% block content %}
 <h1 class="display-1 text-center">Результати</h1>
 </br>
+{% if users %}
 <section>
     {% include 'parser/partials/search.html' %}
 </section>
@@ -24,7 +40,7 @@
                 <tr class="text-center">
                     <td>№</td>
                     <td>Handler</td>
-                    <td>Telegram Id</td>
+                    <td>Telegram id</td>
                     <td>Forum of origin</td>
                 </tr>
                 {%for user in users%}
@@ -33,30 +49,37 @@
                         <td class="container-fluid">
                             <div class="row justify-content-around">
                                 <div class="col-8">{{user.handler}}</div>
-                                <div class="col-1">
-                                    <button type="button" 
-                                            hx-get="/delete_handler/{{user.id}}/?{{request.META.QUERY_STRING}}" 
-                                            class="bg-transparent border-0 text-center">
-                                        <img src="{% static 'parser/img/red_cross.png'%}" class="button-img">
-                                    </button>
-                                </div>
-                                <div class="col-1">
-                                    <button type="button" 
-                                            hx-get="/add_to_keys/{{user.id}}/?{{request.META.QUERY_STRING}}" 
-                                            class="bg-transparent border-0 text-center">
-                                        <img src="{% static 'parser/img/green_plus.png'%}" class="button-img">
-                                    </button>
-                                </div>
-                                <div class="col-1">
-                                    <button type="button" 
-                                            hx-get="/add_to_banned/{{user.id}}/?{{request.META.QUERY_STRING}}" 
-                                            class="bg-transparent border-0 text-center">
-                                        <img src="{% static 'parser/img/red_plus.png'%}" class="button-img">
-                                    </button>
+                                <div class="col-3 container-sm">
+                                    <div class="row justify-content-around">
+                                        <div class="col-1">
+                                            <button type="button" 
+                                                    hx-get="{% url 'delete' id=user.id %}" 
+                                                    class="bg-transparent border-0 text-center"
+                                                    id="deleteUser">
+                                                <img src="{% static 'parser/img/red_cross.png'%}" class="button-img">
+                                            </button>
+                                        </div>
+                                        <div class="col-1">
+                                            <button type="button" 
+                                                    hx-get="{% url 'add_key' id=user.id %}" 
+                                                    class="bg-transparent border-0 text-center"
+                                                    id="addFilter">
+                                                <img src="{% static 'parser/img/green_plus.png'%}" class="button-img">
+                                            </button>
+                                        </div>
+                                        <div class="col-1">
+                                            <button type="button" 
+                                                    hx-get="{% url 'add_banned' id=user.id %}" 
+                                                    class="bg-transparent border-0 text-center"
+                                                    id="addBanned">
+                                                <img src="{% static 'parser/img/red_plus.png'%}" class="button-img">
+                                            </button>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </td>
-                        <td>{{user.user_id}}</td>
+                        <td>{{ user.user_id }}</td>
                         <td><a href="{{user.forumOrigin}}">{{user.forumOrigin}}</a></td>
                     </tr>
                 {%endfor%}
@@ -67,27 +90,48 @@
     <br/>
     <br/>
 
-    <nav aria-label="Page navigation example">
+    <nav aria-label="Page navigation">
         <div name="results_page">
             <ul class="pagination justify-content-center">
                 {%if users.has_previous%}
-                <li class="page-item"><a class="btn btn-success" href="?page=1">&laquo First</a></li>
-                <li class="page-item"><a class="btn btn-success" href="?page={{users.previous_page_number}}">Previous</a></li>
+                    <li class="page-item"><a class="btn bg-success border-dark" href="?page=1">&laquo</a></li>
+                    <li class="page-item"><a class="btn bg-success border-dark" href="?page={{users.previous_page_number}}">Prev</a></li>
+                {% else %}
+                    <li class="page-item"><a class="btn bg-success border-dark disabled" href="#">&laquo</a></li>
+                    <li class="page-item"><a class="btn bg-success border-dark disabled" href="#">Prev</a></li>
                 {%endif%}
-                {%for i in nums %}
-                <li class="page-item"><a class="page-link" href="?page={{forloop.counter}}">{{forloop.counter}}</a></li>
+                {%for i in users.adjusted_elided_pages %}
+                    {% if i == users.paginator.ELLIPSIS %}
+                        <li class="page-item"><a class="page-link bg-success border-dark" style="--bs-bg-opacity: .5" href="#">{{i}}</a></li>
+                    {% else %}
+                        {% if i == users.number %}
+                        <li class="page-item active"><a class="page-link bg-success border-dark" href="#">{{i}}</a></li>
+                        {% else %}
+                        <li class="page-item"><a class="page-link bg-success border-dark" style="--bs-bg-opacity: .5" href="?page={{i}}">{{i}}</a></li>
+                        {% endif %}
+                    {% endif %}
                 {%endfor%}
                 {%if users.has_next%}
-                <li class="page-item"><a class="btn btn-success" href="?page={{users.next_page_number}}">next</a></li>
-                <li class="page-item"><a class="btn btn-success" href="?page={{users.paginator.num_pages}}">Last &raquo</a></li>
+                    <li class="page-item"><a class="btn bg-success border-dark" href="?page={{users.next_page_number}}">Next</a></li>
+                    <li class="page-item"><a class="btn bg-success border-dark" href="?page={{users.paginator.num_pages}}">&raquo</a></li>
+                {% else %}
+                    <li class="page-item"><a class="btn bg-success border-dark disabled" href="#">Next</a></li>
+                    <li class="page-item"><a class="btn bg-success border-dark disabled" href="#">&raquo</a></li>
                 {%endif%}
             </ul>
         </div>
     </nav>
 </div>
+{% else %}
+<div class="container-sm">
+    <div class="row justify-content-around">
+        <div class="col-auto text-center bg-light rounded-3" style="--bs-bg-opacity: .09">В базі даних поки-що немає нікнеймів</div>
+    </div>
+</div>
+{% endif %}
+
 
 <br/>
-{{nums}}
 </div>
     <center>
         <br/>
@@ -95,5 +139,5 @@
         <br/>
         Copyright(c)
     </center>
-{%endblock%}
 </div>
+{%endblock%}
