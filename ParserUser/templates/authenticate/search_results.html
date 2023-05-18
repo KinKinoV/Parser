@@ -18,7 +18,7 @@
 
 
 <div class="d-grid col-6 mx-auto my-5 ">
-    <form method="POST" action="{%url 'admin_search_user'%}" class="container-sm my-3">
+    <form method="GET" action="{%url 'admin_search_user'%}" class="container-sm my-3">
         {% csrf_token %}
         <div class="input-group">
             <input type = "text"
@@ -30,7 +30,7 @@
         <button class ='btn btn-success' id="button-addon2" type="submit">Знайти</button> 
         </div>  
     </form>
-    <a href="{%url 'admin-approval'%}" class="btn btn-success col-12">Go back</a>
+    <a  href="{{request.META.HTTP_REFERER|escape}}" class="btn btn-success col-12">Go back</a>
 </div>
 <div class = "container-sm shadow bg-secondary rounded pt-4">
     <div class="row justify-content-around">
