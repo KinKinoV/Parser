@@ -1,0 +1,121 @@
+{% extends 'parser/base_generic.html' %}
+{%load static%}
+{% block additionalStatic %}
+<style>
+    .button-img {
+        opacity: 0
+    }
+    td:hover .button-img { opacity: 1;}
+</style>
+{% endblock additionalStatic %}
+
+{%block content%}
+{%if user.is_superuser%}
+<h1 class="display-1 text-center">Admin Dashboard</h1>
+<h2 class="text-center">User stuff Approval</h2> 
+<br/>
+<form method="POST" action="{%url 'admin_search_user'%}" class="container-sm my-3">
+    {% csrf_token %}
+    <div class="input-group mb-3">
+        <input type = "text"
+            name = 'search'
+            class = "form-control my-1 w-50"
+            aria-describedby="button-addon2"
+            placeholder = 'Введіть нікнейм користувача'>
+        </input>
+    <button class ='btn btn-success' id="button-addon2" type="submit">Знайти</button> 
+    </div>  
+</form>
+<div class = "container-sm shadow bg-secondary rounded pt-4">
+    <div class="row justify-content-around">
+        <table class="table text-light table-striped">
+            <thead>
+                    <tr>
+                    <th scope="col">Username</th>
+                    <th scope="col">Approved</th>
+                </tr>
+            </thead>
+            <tbody>
+                {%for user in uspage%}
+                <tr>
+                    {%if user.is_superuser%}
+                    {%else%}
+                    <td name="username" class="container-fluid">
+                        <div class="row justify-content-around">
+                            <div class="col-8">{{user.username}}</div>
+                            <div class="col-1">
+                                <button type="button" 
+                                        hx-get="/users/remove_staff/{{user.username}}/?{{request.META.QUERY_STRING}}" 
+                                        class="bg-transparent border-0 text-center">
+                                    <img src="{% static 'parser/img/red_plus.png'%}" class="button-img">
+                                </button>
+                            </div>
+                            <div class="col-1">
+                                <button type="button" 
+                                        hx-get="/users/add_staff/{{user.username}}/?{{request.META.QUERY_STRING}}" 
+                                        class="bg-transparent border-0 text-center">
+                                    <img src="{% static 'parser/img/green_plus.png'%}" class="button-img">
+                                </button>
+                            </div>
+                            <div class="col-1">
+                                <button type="button" 
+                                        hx-get="/users/delete_user/{{user.username}}/?{{request.META.QUERY_STRING}}" 
+                                        class="bg-transparent border-0 text-center">
+                                    <img src="{% static 'parser/img/red_cross.png'%}" class="button-img">
+                                </button>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        {%if user.is_staff%}
+                        Staff
+                        {%else%}
+                        Not Staff
+                        {%endif%}
+                    </td>
+                    {%endif%}
+                    {%endfor%}
+                </tr>
+            </tbody>
+        </table>
+    </div>    
+    <br/>
+</div>     
+
+<br/>
+<br/>
+
+<nav aria-label="Page navigation">
+    <div name="results_page">
+        <ul class="pagination justify-content-center">
+            {%if uspage.has_previous%}
+                <li class="page-item"><a class="btn bg-success border-dark" href="?page=1">&laquo</a></li>
+                <li class="page-item"><a class="btn bg-success border-dark" href="?page={{uspage.previous_page_number}}">Prev</a></li>
+            {% else %}
+                <li class="page-item"><a class="btn bg-success border-dark disabled" href="#">&laquo</a></li>
+                <li class="page-item"><a class="btn bg-success border-dark disabled" href="#">Prev</a></li>
+            {%endif%}
+            {%for i in uspage.adjusted_elided_pages %}
+                {% if i == uspage.paginator.ELLIPSIS %}
+                    <li class="page-item"><a class="page-link bg-success border-dark" style="--bs-bg-opacity: .5" href="#">{{i}}</a></li>
+                {% else %}
+                    {% if i == uspage.number %}
+                    <li class="page-item active"><a class="page-link bg-success border-dark" href="#">{{i}}</a></li>
+                    {% else %}
+                    <li class="page-item"><a class="page-link bg-success border-dark" style="--bs-bg-opacity: .5" href="?page={{i}}">{{i}}</a></li>
+                    {% endif %}
+                {% endif %}
+            {%endfor%}
+            {%if uspage.has_next%}
+                <li class="page-item"><a class="btn bg-success border-dark" href="?page={{uspage.next_page_number}}">Next</a></li>
+                <li class="page-item"><a class="btn bg-success border-dark" href="?page={{uspage.paginator.num_pages}}">&raquo</a></li>
+            {% else %}
+                <li class="page-item"><a class="btn bg-success border-dark disabled" href="#">Next</a></li>
+                <li class="page-item"><a class="btn bg-success border-dark disabled" href="#">&raquo</a></li>
+            {%endif%}
+        </ul>
+    </div>
+</nav>
+</div>
+{%endif%}  
+{%endblock%}

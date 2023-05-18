@@ -11,6 +11,10 @@ from django.views.generic import DetailView,CreateView
 from django.db.models import Q
 from django.contrib.messages.views import SuccessMessageMixin
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.paginator import Paginator
+
+from django.http import HttpResponseRedirect, HttpResponse
+from django.urls import reverse
 # Create your views here.
 
 
@@ -87,16 +91,92 @@ class logOut(LoginRequiredMixin, generic.View):
         logout(request)
         messages.success(request, "User logged out")
         return redirect('about')
-# def register_user(request):
-#     registred = False
-#     if request.method=="POST":
-#         form = RegisterUserForm(request.POST)
-#         if form.is_valid():
-#             user = form.save()
-#             messages.success(request,("Registration were successful"))
-#             return redirect('about')
-#     else:
-#         form = RegisterUserForm()
-#     return render(request,'authenticate/register_user.html',{
-#         'form':form,
-#         })
+
+
+def admin_approval(request):
+    if request.user.is_authenticated:
+        if request.user.is_superuser:
+            user_count=User.objects.all().count()
+            users=User.objects.all().exclude(is_superuser=True).order_by('username')
+            # users_all_ids=[]
+            # approved_users=[]
+            # for i in range(0,len(users),1):
+            #     if users[i].is_staff:
+            #         approved_users.append(str(users[i].id))
+            # for i in range(0,len(users),1):
+            #     users_all_ids.append(str(users[i].id))
+            # if request.method=="POST":
+            #     id_list_approve=request.POST.getlist('boxes')
+
+            #     User.objects.filter(id__in=id_list_approve).update(is_staff=True)
+            #     User.objects.exclude(id__in=id_list_approve).update(is_staff=False)
+                
+            #     # all_approved = id_list_approve + approved_users
+            #     # for item in all_approved:
+            #     #     User.objects.filter(pk=int(item)).update(is_staff=True)
+            #     # id_set_disaprove = set(users_all_ids)-set(all_approved)
+            #     # id_list_disaprove=list(id_set_disaprove)
+            #     # for y in id_list_disaprove:
+            #     #     User.objects.filter(pk=int(y)).update(is_staff=False)
+            #     messages.success(request,("User were promoted"))
+            #     return redirect('admin-approval')
+            # else:
+            p = Paginator(users, 20)
+            page=request.GET.get('page')
+            uspage=p.get_page(page)
+            nums=""*uspage.paginator.num_pages
+            return render(request,'authenticate/admin_approval.html',
+                    {
+                        'user_count':user_count,
+                        'users':users,
+                        'nums':nums,   
+                        'uspage':uspage,     
+                    })
+        else:
+            messages.success(request,("You are not authorized"))
+            return redirect('about')
+    else:
+        messages.success(request,("You are not authorized"))
+        return redirect('about')
+
+def search_user(request):
+    if not request.user.is_superuser:
+        return redirect('about')   
+    search_text = request.POST.get('search')
+    if search_text == None:
+        search_text = ''
+    results =  User.objects.filter(username__icontains=search_text).order_by('id')
+    context = {
+        'search_results':results,
+        'search_text':search_text,
+        }
+    return render(request, 'authenticate/search_results.html', context)
+
+# ============================================[ HTMX functions ]============================================ #
+    
+def remove_staff(request, nickname):
+    if not request.user.is_authenticated:
+        return redirect('about')
+    if request.method == "GET":
+        User.objects.filter(username=nickname).update(is_staff=False)
+        response = HttpResponse("Okay")
+        response["HX-Redirect"] = reverse("admin-approval") + f"?page={request.GET.get('page')}"
+        return response
+
+def add_staff(request, nickname):
+    if not request.user.is_authenticated:
+        return redirect('about')
+    if request.method == "GET":
+        User.objects.filter(username=nickname).update(is_staff=True)
+        response = HttpResponse("Okay")
+        response["HX-Redirect"] = reverse("admin-approval") + f"?page={request.GET.get('page')}"
+        return response
+
+def delete_user(request, nickname):
+    if not request.user.is_superuser:
+        return redirect('about')
+    if request.method == "GET":
+        User.objects.filter(username=nickname).delete()
+        response = HttpResponse("Okay")
+        response["HX-Redirect"] = reverse("admin-approval") + f"?page={request.GET.get('page')}"
+        return response

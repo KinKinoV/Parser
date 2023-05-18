@@ -1,0 +1,90 @@
+{% extends 'parser/base_generic.html' %}
+{%load static%}
+{% block additionalStatic %}
+<style>
+    .button-img {
+        opacity: 0
+    }
+    td:hover .button-img { opacity: 1;}
+</style>
+{% endblock additionalStatic %}
+{%block content%}
+{%if user.is_superuser%}
+
+
+<h1 class="display-1 text-center">{%if search_text != ''%} You searched for {{search_text}}
+    {%else%} You searched for None {%endif%}</h1>
+
+
+
+<div class="d-grid col-6 mx-auto my-5 ">
+    <form method="POST" action="{%url 'admin_search_user'%}" class="container-sm my-3">
+        {% csrf_token %}
+        <div class="input-group">
+            <input type = "text"
+                name = 'search'
+                class = "form-control my-1"
+                aria-describedby="button-addon2"
+                placeholder = 'Введіть нікнейм користувача'>
+            </input>
+        <button class ='btn btn-success' id="button-addon2" type="submit">Знайти</button> 
+        </div>  
+    </form>
+    <a href="{%url 'admin-approval'%}" class="btn btn-success col-12">Go back</a>
+</div>
+<div class = "container-sm shadow bg-secondary rounded pt-4">
+    <div class="row justify-content-around">
+        <table class="table text-light table-striped">
+            <thead>
+                    <tr>
+                    <th scope="col">Username</th>
+                    <th scope="col">Approved</th>
+                </tr>
+            </thead>
+            <tbody>
+                {%for user in search_results%}
+                <tr>
+                    {%if user.is_superuser%}
+                    {%else%}
+                    <td name="username" class="container-fluid">
+                        <div class="row justify-content-around">
+                            <div class="col-8">{{user.username}}</div>
+                            <div class="col-1">
+                                <button type="button" 
+                                        hx-get="/users/remove_staff/{{user.username}}/?{{request.META.QUERY_STRING}}" 
+                                        class="bg-transparent border-0 text-center">
+                                    <img src="{% static 'parser/img/red_plus.png'%}" class="button-img">
+                                </button>
+                            </div>
+                            <div class="col-1">
+                                <button type="button" 
+                                        hx-get="/users/add_staff/{{user.username}}/?{{request.META.QUERY_STRING}}" 
+                                        class="bg-transparent border-0 text-center">
+                                    <img src="{% static 'parser/img/green_plus.png'%}" class="button-img">
+                                </button>
+                            </div>
+                            <div class="col-1">
+                                <button type="button" 
+                                        hx-get="/users/delete_user/{{user.username}}/?{{request.META.QUERY_STRING}}" 
+                                        class="bg-transparent border-0 text-center">
+                                    <img src="{% static 'parser/img/red_cross.png'%}" class="button-img">
+                                </button>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        {%if user.is_staff%}
+                        Staff
+                        {%else%}
+                        Not Staff
+                        {%endif%}
+                    </td>
+                    {%endif%}
+                    {%endfor%}
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>    
+{%endif%}
+{%endblock%}
