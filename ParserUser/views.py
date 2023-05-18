@@ -142,7 +142,7 @@ def admin_approval(request):
 def search_user(request):
     if not request.user.is_superuser:
         return redirect('about')   
-    search_text = request.POST.get('search')
+    search_text = request.GET.get('search')
     if search_text == None:
         search_text = ''
     results =  User.objects.filter(username__icontains=search_text).order_by('id')
@@ -158,9 +158,11 @@ def remove_staff(request, nickname):
     if not request.user.is_authenticated:
         return redirect('about')
     if request.method == "GET":
+        #in Meta we have lots of data, we should reconsider this thing.
+        previous_url=request.META['HTTP_REFERER'].replace('http://localhost:8000','')
         User.objects.filter(username=nickname).update(is_staff=False)
         response = HttpResponse("Okay")
-        response["HX-Redirect"] = reverse("admin-approval") + f"?page={request.GET.get('page')}"
+        response["HX-Redirect"] = previous_url
         return response
 
 def add_staff(request, nickname):
@@ -169,7 +171,7 @@ def add_staff(request, nickname):
     if request.method == "GET":
         User.objects.filter(username=nickname).update(is_staff=True)
         response = HttpResponse("Okay")
-        response["HX-Redirect"] = reverse("admin-approval") + f"?page={request.GET.get('page')}"
+        response["HX-Redirect"] = request.META['HTTP_REFERER'].replace('http://localhost:8000','')
         return response
 
 def delete_user(request, nickname):
@@ -178,5 +180,5 @@ def delete_user(request, nickname):
     if request.method == "GET":
         User.objects.filter(username=nickname).delete()
         response = HttpResponse("Okay")
-        response["HX-Redirect"] = reverse("admin-approval") + f"?page={request.GET.get('page')}"
+        response["HX-Redirect"] = request.META['HTTP_REFERER'].replace('http://localhost:8000','')
         return response
